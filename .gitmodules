@@ -1,0 +1,6 @@
+[submodule "client"]
+	path = client
+	url = https://github.com/arsurgicalhubjaffna-ops/AR_Surgical_Hub_client.git
+[submodule "server"]
+	path = server
+	url = https://github.com/arsurgicalhubjaffna-ops/AR_Surgical_Hub_server.git
