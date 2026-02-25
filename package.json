@@ -1,0 +1,14 @@
+{
+    "name": "ar-surgical-hub",
+    "version": "1.0.0",
+    "description": "AR Surgical Hub - Medical Equipment Platform",
+    "scripts": {
+        "install:all": "npm install --prefix server && npm install --prefix client",
+        "build": "npm install --prefix client && npm run build --prefix client",
+        "start": "node server/index.js",
+        "dev": "node server/index.js"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}

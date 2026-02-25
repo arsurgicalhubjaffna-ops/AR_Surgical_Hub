@@ -1,0 +1,515 @@
+/* ===================================================
+   ADMIN PANEL — AR Surgical Hub (stays dark)
+   Light page → dark admin: professional contrast
+   Brand Green #00B5A4 | Deep navy bg
+   =================================================== */
+
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background: #0d1e30;
+}
+
+/* ── Sidebar ── */
+.admin-sidebar {
+    width: 256px;
+    min-height: 100vh;
+    background: #081221;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.admin-logo {
+    padding: 22px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 8px;
+}
+
+.admin-logo h2 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #e8f0f7;
+    margin: 0 0 2px;
+    font-family: var(--font-header);
+}
+
+.admin-logo span {
+    font-size: 0.68rem;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-weight: 600;
+}
+
+/* ── Nav ── */
+.admin-nav {
+    flex: 1;
+    padding: 8px 12px;
+    overflow-y: auto;
+}
+
+.admin-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+    font-size: 0.87rem;
+    font-weight: 500;
+    font-family: var(--font-primary);
+    transition: all var(--transition);
+    margin-bottom: 2px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    border-left: 3px solid transparent;
+}
+
+.admin-nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.admin-nav-item.active {
+    background: rgba(0, 181, 164, 0.12);
+    color: var(--green);
+    font-weight: 600;
+    border-left-color: var(--green);
+}
+
+.admin-nav-item svg {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+}
+
+.admin-sidebar-footer {
+    padding: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── Main ── */
+.admin-main {
+    margin-left: 256px;
+    flex: 1;
+    background: #0d1e30;
+    min-height: 100vh;
+}
+
+.admin-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 28px;
+    background: #081221;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.admin-topbar h1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #e8f0f7;
+    margin: 0;
+    font-family: var(--font-header);
+}
+
+.admin-user-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.admin-content {
+    padding: 26px 28px;
+}
+
+/* ── Stats grid ── */
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: #112236;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: border-color var(--transition), transform 0.25s;
+}
+
+.stat-card:hover {
+    border-color: rgba(0, 181, 164, 0.3);
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-icon.blue {
+    background: rgba(53, 151, 199, 0.15);
+    color: #3597c7;
+}
+
+.stat-icon.green {
+    background: rgba(0, 181, 164, 0.15);
+    color: var(--green);
+}
+
+.stat-icon.purple {
+    background: rgba(139, 92, 246, 0.12);
+    color: #a78bfa;
+}
+
+.stat-icon.yellow {
+    background: rgba(234, 179, 8, 0.12);
+    color: #fbbf24;
+}
+
+.stat-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.stat-info h3 {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: rgba(255, 255, 255, 0.35);
+    margin: 0 0 4px;
+    font-weight: 600;
+}
+
+.stat-info p {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: #e8f0f7;
+    margin: 0;
+    line-height: 1;
+    font-family: var(--font-header);
+    letter-spacing: -0.5px;
+}
+
+/* ── Table card ── */
+.admin-table-card {
+    background: #112236;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 22px;
+}
+
+.admin-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.admin-table-header h2 {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #e8f0f7;
+    margin: 0;
+    font-family: var(--font-header);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 10px 18px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-table td {
+    padding: 12px 18px;
+    color: #c7d8e4;
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.admin-table tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* ── Badges ── */
+.badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.badge-pending {
+    background: rgba(234, 179, 8, 0.12);
+    color: #fbbf24;
+    border: 1px solid rgba(234, 179, 8, 0.2);
+}
+
+.badge-processing {
+    background: rgba(53, 151, 199, 0.12);
+    color: #3597c7;
+    border: 1px solid rgba(53, 151, 199, 0.2);
+}
+
+.badge-shipped {
+    background: rgba(139, 92, 246, 0.12);
+    color: #a78bfa;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.badge-delivered {
+    background: rgba(0, 181, 164, 0.12);
+    color: var(--green);
+    border: 1px solid rgba(0, 181, 164, 0.2);
+}
+
+.badge-cancelled {
+    background: rgba(229, 62, 62, 0.1);
+    color: #fc8181;
+    border: 1px solid rgba(229, 62, 62, 0.2);
+}
+
+.badge-admin {
+    background: rgba(53, 151, 199, 0.12);
+    color: #3597c7;
+    border: 1px solid rgba(53, 151, 199, 0.2);
+}
+
+.badge-customer {
+    background: rgba(0, 181, 164, 0.12);
+    color: var(--green);
+    border: 1px solid rgba(0, 181, 164, 0.2);
+}
+
+/* ── Action buttons ── */
+.action-btn {
+    padding: 5px 11px;
+    border-radius: 6px;
+    font-size: 0.77rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin: 2px;
+    font-family: var(--font-primary);
+}
+
+.action-btn-edit {
+    background: rgba(53, 151, 199, 0.12);
+    color: #3597c7;
+    border: 1px solid rgba(53, 151, 199, 0.2);
+}
+
+.action-btn-edit:hover {
+    background: rgba(53, 151, 199, 0.22);
+}
+
+.action-btn-delete {
+    background: rgba(229, 62, 62, 0.1);
+    color: #fc8181;
+    border: 1px solid rgba(229, 62, 62, 0.18);
+}
+
+.action-btn-delete:hover {
+    background: rgba(229, 62, 62, 0.2);
+}
+
+.action-btn-save {
+    background: var(--green);
+    color: #fff;
+}
+
+.action-btn-save:hover {
+    background: var(--green-dark);
+}
+
+/* ── Modal ── */
+.admin-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-modal {
+    background: #112236;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 30px;
+    width: 480px;
+    max-width: 92vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6);
+}
+
+.admin-modal h2 {
+    margin: 0 0 22px;
+    font-size: 1.1rem;
+    font-family: var(--font-header);
+    color: #e8f0f7;
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.35);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px 13px;
+    color: #e8f0f7;
+    font-size: 0.88rem;
+    font-family: var(--font-primary);
+    transition: border-color var(--transition), box-shadow var(--transition);
+    box-sizing: border-box;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(0, 181, 164, 0.12);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group select option {
+    background: #112236;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+    justify-content: flex-end;
+}
+
+.btn-cancel {
+    padding: 9px 18px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    font-size: 0.87rem;
+    font-family: var(--font-primary);
+    transition: all var(--transition);
+}
+
+.btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Misc */
+.product-image-thumb {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.status-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #c7d8e4;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 0.77rem;
+    cursor: pointer;
+    font-family: var(--font-primary);
+    outline: none;
+}
+
+.status-select:focus {
+    border-color: var(--green);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 0.88rem;
+}
+
+.admin-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 260px;
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 0.88rem;
+}

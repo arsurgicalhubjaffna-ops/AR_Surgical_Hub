@@ -1,0 +1,337 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+/* ================================================================
+   AR SURGICAL HUB — LIGHT MEDICAL THEME
+   Brand: Teal-Green #00B5A4 + White base
+   Aesthetic: Clean · Bright · Professional Medical E-commerce
+   ================================================================ */
+
+:root {
+  /* ── Brand (from logo + reference design) ── */
+  --green: #00B5A4;
+  --green-dark: #008f81;
+  --green-light: #e6f7f5;
+  --green-dim: rgba(0, 181, 164, 0.1);
+  --green-border: rgba(0, 181, 164, 0.25);
+
+  --blue: #3597C7;
+  --blue-dim: rgba(53, 151, 199, 0.1);
+  --blue-border: rgba(53, 151, 199, 0.2);
+
+  /* ── Semantic ── */
+  --primary: var(--green);
+  --primary-dark: var(--green-dark);
+  --accent: var(--blue);
+
+  /* ── Surface / Background ── */
+  --bg: #f4f8f7;
+  --bg-alt: #eef5f4;
+  --surface: #ffffff;
+  --surface-2: #f9fffe;
+  --surface-raised: #ffffff;
+
+  /* ── Borders ── */
+  --border: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 181, 164, 0.3);
+
+  /* ── Text ── */
+  --text-primary: #1a2e2d;
+  --text-secondary: #5a7473;
+  --text-muted: #9db3b2;
+
+  /* ── Legacy compat ── */
+  --color-navy: #1a2e2d;
+  --color-teal: var(--green);
+  --color-cyan: var(--blue);
+  --color-white: #ffffff;
+  --color-gray: #5a7473;
+  --color-red: #e53e3e;
+  --bg-dark: #f4f8f7;
+  --surface-dark: #1a2e2d;
+  /* used for footer */
+
+  /* ── Typography ── */
+  --font-primary: 'DM Sans', sans-serif;
+  --font-header: 'Plus Jakarta Sans', sans-serif;
+
+  /* ── Motion ── */
+  --transition: 0.2s ease;
+  --transition-slow: 0.35s ease;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.07);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.09);
+  --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.12);
+  --shadow-green: 0 4px 18px rgba(0, 181, 164, 0.25);
+}
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+img,
+video {
+  max-width: 100%;
+  display: block;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Body ── */
+body {
+  font-family: var(--font-primary);
+  background-color: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.65;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Container ── */
+.container {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 40px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 20px;
+  }
+}
+
+/* ── Headings ── */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-header);
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+/* ── Links ── */
+a {
+  text-decoration: none;
+  color: var(--green);
+  transition: color var(--transition);
+}
+
+a:hover {
+  color: var(--green-dark);
+  filter: none;
+}
+
+/* ── Glass (light) ── */
+.bg-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px) saturate(1.5);
+  -webkit-backdrop-filter: blur(12px) saturate(1.5);
+  border: 1px solid var(--border);
+}
+
+/* ================================================================
+   BUTTONS
+   ================================================================ */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--green);
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+  box-shadow: var(--shadow-green);
+  white-space: nowrap;
+  letter-spacing: 0.1px;
+}
+
+.btn-primary:hover {
+  background: var(--green-dark);
+  box-shadow: 0 6px 28px rgba(0, 181, 164, 0.35);
+  transform: translateY(-1px);
+  color: #fff;
+  filter: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  color: var(--text-primary);
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+.btn-secondary:hover {
+  border-color: var(--green);
+  color: var(--green);
+  background: var(--green-light);
+  filter: none;
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--green);
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 1.5px solid var(--green);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.btn-outline:hover {
+  background: var(--green-dim);
+  filter: none;
+  color: var(--green);
+}
+
+/* ================================================================
+   CARD
+   ================================================================ */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-slow), transform var(--transition-slow), border-color var(--transition);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+  border-color: var(--green-border);
+}
+
+/* ================================================================
+   SECTIONS
+   ================================================================ */
+
+.section {
+  padding: 80px 0;
+}
+
+.section-sm {
+  padding: 50px 0;
+}
+
+.section-alt {
+  background: var(--bg-alt);
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--green);
+  margin-bottom: 12px;
+}
+
+.section-label::before {
+  content: '';
+  width: 18px;
+  height: 2px;
+  background: var(--green);
+  border-radius: 2px;
+}
+
+.section-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 14px;
+  letter-spacing: -0.5px;
+}
+
+.section-title span {
+  color: var(--green);
+}
+
+/* ================================================================
+   FORM INPUT
+   ================================================================ */
+
+.input-field {
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+  font-size: 0.93rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px var(--green-dim);
+}
+
+.input-field::placeholder {
+  color: var(--text-muted);
+}
+
+/* ================================================================
+   SCROLLBAR
+   ================================================================ */
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c0d8d6;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--green);
+}
+
+::selection {
+  background: rgba(0, 181, 164, 0.18);
+  color: var(--text-primary);
+}

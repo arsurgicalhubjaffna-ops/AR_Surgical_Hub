@@ -1,0 +1,164 @@
+.product-detail {
+    padding: 80px 0;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.detail-image {
+    padding: 40px;
+    border-radius: 32px;
+}
+
+.detail-image img {
+    width: 100%;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.detail-info h1 {
+    font-size: 3rem;
+    margin: 15px 0;
+}
+
+.detail-info .price {
+    font-size: 2rem;
+    color: var(--color-teal);
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+.detail-info .description {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+    line-height: 1.8;
+}
+
+.trust-badges {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.trust-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.detail-actions {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.detail-actions button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 30px;
+}
+
+.stock-info {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.reviews-section {
+    margin-top: 80px;
+    border-top: 1px solid var(--border);
+    padding-top: 60px;
+}
+
+.reviews-section h2 {
+    margin-bottom: 40px;
+}
+
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.review-card {
+    padding: 25px;
+    border-radius: 16px;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.stars {
+    color: var(--color-gray);
+}
+
+.star.filled {
+    color: #fbbf24;
+}
+
+.review-card p {
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.review-card small {
+    color: var(--color-gray);
+    font-size: 0.8rem;
+}
+
+.add-review-form {
+    margin-top: 50px;
+    padding: 30px;
+    border-radius: 20px;
+}
+
+.add-review-form h3 {
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+}
+
+.rating-select {
+    display: flex;
+    gap: 5px;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.star.clickable {
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.star.clickable:hover {
+    transform: scale(1.2);
+}
+
+.add-review-form textarea {
+    width: 100%;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 15px;
+    color: var(--text-primary);
+    outline: none;
+    font-family: var(--font-primary);
+}

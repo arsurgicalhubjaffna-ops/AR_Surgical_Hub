@@ -1,0 +1,111 @@
+Table roles {
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar(50) [unique, not null]
+  created_at timestamp [default: `now()`]
+}
+
+Table users {
+  id uuid [pk, default: `gen_random_uuid()`]
+  role_id uuid [ref: > roles.id]
+  full_name varchar(150) [not null]
+  email varchar(150) [unique, not null]
+  phone varchar(20)
+  password_hash text [not null]
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table categories {
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar(150) [not null]
+  description text
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table products {
+  id uuid [pk, default: `gen_random_uuid()`]
+  category_id uuid [ref: > categories.id]
+  name varchar(200) [not null]
+  description text
+  price numeric(12,2) [not null]
+  stock integer [default: 0]
+  image_url text
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table product_reviews {
+  id uuid [pk, default: `gen_random_uuid()`]
+  product_id uuid [ref: > products.id]
+  user_id uuid [ref: > users.id]
+  rating integer [not null]
+  comment text
+  created_at timestamp [default: `now()`]
+}
+
+Table wishlist {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [ref: > users.id]
+  product_id uuid [ref: > products.id]
+  created_at timestamp [default: `now()`]
+  
+  Indexes {
+    (user_id, product_id) [unique]
+  }
+}
+
+Table orders {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [ref: > users.id]
+  total_amount numeric(12,2) [not null]
+  status varchar(50) [default: 'pending']
+  shipping_address text
+  payment_method varchar(50)
+  payment_status varchar(50) [default: 'unpaid']
+  created_at timestamp [default: `now()`]
+}
+
+Table order_items {
+  id uuid [pk, default: `gen_random_uuid()`]
+  order_id uuid [ref: > orders.id]
+  product_id uuid [ref: > products.id]
+  quantity integer [not null]
+  price numeric(12,2) [not null]
+}
+
+Table quotes {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [ref: > users.id]
+  message text
+  status varchar(50) [default: 'new']
+  created_at timestamp [default: `now()`]
+}
+
+Table careers {
+  id uuid [pk, default: `gen_random_uuid()`]
+  title varchar(200) [not null]
+  description text
+  created_at timestamp [default: `now()`]
+}
+
+Table vacancies {
+  id uuid [pk, default: `gen_random_uuid()`]
+  career_id uuid [ref: > careers.id]
+  position varchar(200) [not null]
+  location varchar(150)
+  salary_range varchar(100)
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+}
+
+Table settings {
+  id uuid [pk, default: `gen_random_uuid()`]
+  site_name varchar(150)
+  contact_email varchar(150)
+  contact_phone varchar(50)
+  address text
+  updated_at timestamp [default: `now()`]
+}
