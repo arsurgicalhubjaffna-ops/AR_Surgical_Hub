@@ -1,25 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import API_URL from '../../config/api';
+import insforge from '../../lib/insforge';
 import { ShoppingBag, Users, Package, DollarSign, TrendingUp, Clock } from 'lucide-react';
 
-const API = `${API_URL}/api`;
-
-const AdminDashboard = ({ token }) => {
+const AdminDashboard = () => {
     const [stats, setStats] = useState(null);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const headers = { Authorization: `Bearer ${token}` };
-        Promise.all([
-            axios.get(`${API}/admin/stats`, { headers }),
-            axios.get(`${API}/admin/orders`, { headers }),
-        ]).then(([statsRes, ordersRes]) => {
-            setStats(statsRes.data);
-            setOrders(ordersRes.data.slice(0, 5));
-        }).catch(console.error).finally(() => setLoading(false));
-    }, [token]);
+        const loadStats = async () => {
+            try {
+                // Fetch counts in parallel
+                const [productsRes, usersRes, ordersRes] = await Promise.all([
+                    insforge.db.from('products').select('id', { count: 'exact', head: true }),
+                    insforge.db.from('users').select('id', { count: 'exact', head: true }),
+                    insforge.db.from('orders').select('id, total_amount, payment_status'),
+                ]);
+
+                const totalOrders = ordersRes.data?.length || 0;
+                const revenue = (ordersRes.data || [])
+                    .filter(o => o.payment_status === 'paid')
+                    .reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+
+                setStats({
+                    products: productsRes.count || 0,
+                    users: usersRes.count || 0,
+                    orders: totalOrders,
+                    revenue: revenue,
+                });
+
+                // Fetch recent orders with user info
+                const { data: recentOrders } = await insforge.db
+                    .from('orders')
+                    .select('*, users(full_name, email)')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                const mapped = (recentOrders || []).map(o => ({
+                    ...o,
+                    full_name: o.users?.full_name || null,
+                    email: o.users?.email || null,
+                }));
+                setOrders(mapped);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadStats();
+    }, []);
 
     if (loading) return <div className="admin-loading">Loading dashboard...</div>;
 

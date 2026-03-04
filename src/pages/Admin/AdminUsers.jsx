@@ -1,19 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import API_URL from '../../config/api';
+import insforge from '../../lib/insforge';
 
-const API = `${API_URL}/api`;
-
-const AdminUsers = ({ token }) => {
+const AdminUsers = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get(`${API}/admin/users`, { Authorization: `Bearer ${token}` }
-            ? { headers: { Authorization: `Bearer ${token}` } }
-            : {}
-        ).then(r => setUsers(r.data)).finally(() => setLoading(false));
-    }, [token]);
+        const fetchUsers = async () => {
+            try {
+                const { data, error } = await insforge.db
+                    .from('users')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                setUsers(data || []);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUsers();
+    }, []);
 
     if (loading) return <div className="admin-loading">Loading users...</div>;
 

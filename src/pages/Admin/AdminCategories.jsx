@@ -1,28 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import API_URL from '../../config/api';
+import insforge from '../../lib/insforge';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
-
-const API = `${API_URL}/api`;
 
 const emptyForm = { name: '', description: '', image_url: '' };
 
-const AdminCategories = ({ token }) => {
+const AdminCategories = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [modal, setModal] = useState(false);
     const [form, setForm] = useState(emptyForm);
     const [editId, setEditId] = useState(null);
 
-    const headers = { Authorization: `Bearer ${token}` };
-
-    const load = () => {
-        axios.get(`${API}/admin/categories`, { headers })
-            .then(res => setCategories(res.data))
-            .finally(() => setLoading(false));
+    const load = async () => {
+        try {
+            const { data, error } = await insforge.db
+                .from('categories')
+                .select('*')
+                .order('name', { ascending: true });
+            if (error) throw error;
+            setCategories(data || []);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    useEffect(load, []);
+    useEffect(() => { load(); }, []);
 
     const openAdd = () => { setForm(emptyForm); setEditId(null); setModal(true); };
     const openEdit = (c) => {
@@ -33,10 +37,23 @@ const AdminCategories = ({ token }) => {
 
     const save = async () => {
         try {
+            const payload = {
+                name: form.name,
+                description: form.description || null,
+                image_url: form.image_url || null,
+            };
+
             if (editId) {
-                await axios.put(`${API}/admin/categories/${editId}`, form, { headers });
+                const { error } = await insforge.db
+                    .from('categories')
+                    .update(payload)
+                    .eq('id', editId);
+                if (error) throw error;
             } else {
-                await axios.post(`${API}/admin/categories`, form, { headers });
+                const { error } = await insforge.db
+                    .from('categories')
+                    .insert([payload]);
+                if (error) throw error;
             }
             setModal(false);
             load();
@@ -48,7 +65,8 @@ const AdminCategories = ({ token }) => {
     const del = async (id) => {
         if (!confirm('Delete this category? Products in this category might become unlinked.')) return;
         try {
-            await axios.delete(`${API}/admin/categories/${id}`, { headers });
+            const { error } = await insforge.db.from('categories').delete().eq('id', id);
+            if (error) throw error;
             load();
         } catch (err) {
             alert('Failed to delete category');

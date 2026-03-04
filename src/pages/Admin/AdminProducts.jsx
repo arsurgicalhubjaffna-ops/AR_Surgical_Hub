@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import API_URL from '../../config/api';
+import insforge from '../../lib/insforge';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
-
-const API = `${API_URL}/api`;
 
 const emptyForm = { name: '', description: '', price: '', stock: '', category_id: '', image_url: '' };
 
-const AdminProducts = ({ token }) => {
+const AdminProducts = () => {
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -15,19 +12,26 @@ const AdminProducts = ({ token }) => {
     const [form, setForm] = useState(emptyForm);
     const [editId, setEditId] = useState(null);
 
-    const headers = { Authorization: `Bearer ${token}` };
-
-    const load = () => {
-        Promise.all([
-            axios.get(`${API}/admin/products`, { headers }),
-            axios.get(`${API}/admin/categories`, { headers }),
-        ]).then(([pr, cr]) => {
-            setProducts(pr.data);
-            setCategories(cr.data);
-        }).finally(() => setLoading(false));
+    const load = async () => {
+        try {
+            const [productsRes, categoriesRes] = await Promise.all([
+                insforge.db.from('products').select('*, categories(name)').order('created_at', { ascending: false }),
+                insforge.db.from('categories').select('*').order('name', { ascending: true }),
+            ]);
+            const mapped = (productsRes.data || []).map(p => ({
+                ...p,
+                category_name: p.categories?.name || null,
+            }));
+            setProducts(mapped);
+            setCategories(categoriesRes.data || []);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    useEffect(load, []);
+    useEffect(() => { load(); }, []);
 
     const openAdd = () => { setForm(emptyForm); setEditId(null); setModal(true); };
     const openEdit = (p) => {
@@ -38,10 +42,27 @@ const AdminProducts = ({ token }) => {
 
     const save = async () => {
         try {
+            const payload = {
+                name: form.name,
+                description: form.description,
+                price: Number(form.price),
+                stock: Number(form.stock),
+                category_id: form.category_id || null,
+                image_url: form.image_url || null,
+                is_active: true,
+            };
+
             if (editId) {
-                await axios.put(`${API}/admin/products/${editId}`, { ...form, is_active: 1 }, { headers });
+                const { error } = await insforge.db
+                    .from('products')
+                    .update(payload)
+                    .eq('id', editId);
+                if (error) throw error;
             } else {
-                await axios.post(`${API}/admin/products`, form, { headers });
+                const { error } = await insforge.db
+                    .from('products')
+                    .insert([payload]);
+                if (error) throw error;
             }
             setModal(false);
             load();
@@ -52,7 +73,8 @@ const AdminProducts = ({ token }) => {
 
     const del = async (id) => {
         if (!confirm('Delete this product?')) return;
-        await axios.delete(`${API}/admin/products/${id}`, { headers });
+        const { error } = await insforge.db.from('products').delete().eq('id', id);
+        if (error) { alert('Failed to delete product'); return; }
         load();
     };
 

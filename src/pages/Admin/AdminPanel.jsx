@@ -27,23 +27,22 @@ const PAGE_TITLES = {
 
 const AdminPanel = () => {
     const [activePage, setActivePage] = useState('dashboard');
-    const { user, token, logout } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
+        await logout();
         navigate('/');
     };
 
     const renderPage = () => {
-        const props = { token };
         switch (activePage) {
-            case 'dashboard': return <AdminDashboard {...props} />;
-            case 'products': return <AdminProducts {...props} />;
-            case 'categories': return <AdminCategories {...props} />;
-            case 'orders': return <AdminOrders {...props} />;
-            case 'users': return <AdminUsers {...props} />;
-            default: return <AdminDashboard {...props} />;
+            case 'dashboard': return <AdminDashboard />;
+            case 'products': return <AdminProducts />;
+            case 'categories': return <AdminCategories />;
+            case 'orders': return <AdminOrders />;
+            case 'users': return <AdminUsers />;
+            default: return <AdminDashboard />;
         }
     };
 

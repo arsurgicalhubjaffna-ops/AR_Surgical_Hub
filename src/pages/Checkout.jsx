@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import API_URL from '../config/api';
+import insforge from '../lib/insforge';
 import './Checkout.css';
 
 const Checkout = () => {
@@ -22,19 +21,36 @@ const Checkout = () => {
         }
 
         try {
-            const orderData = {
-                user_id: user.id,
-                total_amount: cartTotal,
-                shipping_address: address,
-                payment_method: paymentMethod,
-                items: cart.map(item => ({
-                    product_id: item.id,
-                    quantity: item.quantity,
-                    price: item.price
-                }))
-            };
+            // Create order
+            const { data: order, error: orderError } = await insforge.db
+                .from('orders')
+                .insert([{
+                    user_id: user.id,
+                    total_amount: cartTotal,
+                    shipping_address: address,
+                    payment_method: paymentMethod,
+                    status: 'pending',
+                    payment_status: 'unpaid',
+                }])
+                .select()
+                .single();
 
-            await axios.post(`${API_URL}/api/orders`, orderData);
+            if (orderError) throw orderError;
+
+            // Create order items
+            const orderItems = cart.map(item => ({
+                order_id: order.id,
+                product_id: item.id,
+                quantity: item.quantity,
+                price: item.price
+            }));
+
+            const { error: itemsError } = await insforge.db
+                .from('order_items')
+                .insert(orderItems);
+
+            if (itemsError) throw itemsError;
+
             alert('Order placed successfully!');
             clearCart();
             navigate('/');

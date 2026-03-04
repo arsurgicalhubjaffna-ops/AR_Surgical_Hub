@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import API_URL from '../config/api';
+import insforge from '../lib/insforge';
 import { Link } from 'react-router-dom';
 import './Categories.css';
 
@@ -11,8 +10,12 @@ const Categories = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await axios.get(`${API_URL}/api/categories`);
-                setCategories(res.data);
+                const { data, error } = await insforge.db
+                    .from('categories')
+                    .select('*')
+                    .order('name', { ascending: true });
+                if (error) throw error;
+                setCategories(data || []);
             } catch (err) {
                 console.error(err);
             } finally {

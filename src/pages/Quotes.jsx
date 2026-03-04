@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Send, FileText, ClipboardList } from 'lucide-react';
-import axios from 'axios';
-import API_URL from '../config/api';
+import insforge from '../lib/insforge';
 import { useAuth } from '../context/AuthContext';
 import './Quotes.css';
 
@@ -14,10 +13,12 @@ const Quotes = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post(`${API_URL}/api/quotes`, {
-                ...formData,
-                user_id: user ? user.id : null
-            });
+            const { error } = await insforge.db.from('quotes').insert([{
+                message: formData.message,
+                user_id: user ? user.id : null,
+                status: 'new',
+            }]);
+            if (error) throw error;
             alert('Quote request sent successfully!');
             setFormData({ message: '' });
         } catch (err) {

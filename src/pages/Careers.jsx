@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Briefcase, MapPin, DollarSign, Clock } from 'lucide-react';
-import axios from 'axios';
-import API_URL from '../config/api';
+import insforge from '../lib/insforge';
 import './Careers.css';
 
 const Careers = () => {
@@ -11,8 +10,13 @@ const Careers = () => {
     useEffect(() => {
         const fetchVacancies = async () => {
             try {
-                const res = await axios.get(`${API_URL}/api/vacancies`);
-                setVacancies(res.data);
+                const { data, error } = await insforge.db
+                    .from('vacancies')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                setVacancies(data || []);
             } catch (err) {
                 console.error(err);
             } finally {

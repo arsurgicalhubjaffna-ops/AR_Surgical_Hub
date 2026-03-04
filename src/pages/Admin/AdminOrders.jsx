@@ -1,27 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import API_URL from '../../config/api';
+import insforge from '../../lib/insforge';
 
-const API = `${API_URL}/api`;
 const STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 
-const AdminOrders = ({ token }) => {
+const AdminOrders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const headers = { Authorization: `Bearer ${token}` };
-
-    const load = () => {
-        axios.get(`${API}/admin/orders`, { headers })
-            .then(r => setOrders(r.data))
-            .finally(() => setLoading(false));
+    const load = async () => {
+        try {
+            const { data, error } = await insforge.db
+                .from('orders')
+                .select('*, users(full_name, email)')
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            const mapped = (data || []).map(o => ({
+                ...o,
+                full_name: o.users?.full_name || null,
+                email: o.users?.email || null,
+            }));
+            setOrders(mapped);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    useEffect(load, []);
+    useEffect(() => { load(); }, []);
 
     const updateStatus = async (id, status) => {
-        await axios.put(`${API}/admin/orders/${id}/status`, { status }, { headers });
-        load();
+        try {
+            const { error } = await insforge.db
+                .from('orders')
+                .update({ status })
+                .eq('id', id);
+            if (error) throw error;
+            load();
+        } catch (err) {
+            alert('Failed to update order status');
+        }
     };
 
     if (loading) return <div className="admin-loading">Loading orders...</div>;

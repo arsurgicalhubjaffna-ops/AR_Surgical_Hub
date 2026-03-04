@@ -4,8 +4,7 @@ import {
     Stethoscope, Microscope, Eye, Star, ChevronRight
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-import API_URL from '../config/api';
+import insforge from '../lib/insforge';
 import ProductCard from '../components/ProductCard';
 import './Home.css';
 
@@ -42,11 +41,22 @@ const Home = () => {
     useEffect(() => {
         const load = async () => {
             try {
-                const { data } = await axios.get(`${API_URL}/api/products?limit=8`);
-                const products = data.products || data || [];
-                setFeatured(products.slice(0, 4));
-                setLatest(products.slice(0, 6));
-                setTrending(products.slice(0, 4));
+                const { data, error } = await insforge.db
+                    .from('products')
+                    .select('*, categories(name)')
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: false })
+                    .limit(8);
+
+                const products = data || [];
+                // Map category name for ProductCard compatibility
+                const mapped = products.map(p => ({
+                    ...p,
+                    category_name: p.categories?.name || null,
+                }));
+                setFeatured(mapped.slice(0, 4));
+                setLatest(mapped.slice(0, 6));
+                setTrending(mapped.slice(0, 4));
             } catch { /* use empty arrays */ }
             setLoading(false);
         };

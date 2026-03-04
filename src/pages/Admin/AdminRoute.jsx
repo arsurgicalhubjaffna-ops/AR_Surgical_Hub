@@ -4,8 +4,12 @@ import { useAuth } from '../../context/AuthContext';
 import './Admin.css';
 
 const AdminRoute = ({ children }) => {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
     const navigate = useNavigate();
+
+    if (loading) {
+        return <div className="admin-loading">Loading...</div>;
+    }
 
     if (!user) {
         navigate('/login');

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import API_URL from '../config/api';
+import insforge from '../lib/insforge';
 import { useLocation } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import './Shop.css';
@@ -16,11 +15,24 @@ const Shop = () => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const url = categoryId
-                    ? `${API_URL}/api/products?category=${categoryId}`
-                    : `${API_URL}/api/products`;
-                const res = await axios.get(url);
-                setProducts(res.data);
+                let query = insforge.db
+                    .from('products')
+                    .select('*, categories(name)')
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: false });
+
+                if (categoryId) {
+                    query = query.eq('category_id', categoryId);
+                }
+
+                const { data, error } = await query;
+                if (error) throw error;
+                // Map category name for ProductCard compatibility
+                const mapped = (data || []).map(p => ({
+                    ...p,
+                    category_name: p.categories?.name || null,
+                }));
+                setProducts(mapped);
             } catch (err) {
                 console.error('Error fetching products:', err);
             } finally {

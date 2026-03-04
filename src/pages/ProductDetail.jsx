@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
-import API_URL from '../config/api';
+import insforge from '../lib/insforge';
 import { ShoppingCart, Heart, Shield, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -24,11 +23,23 @@ const ProductDetail = () => {
     const fetchDetails = async () => {
         try {
             const [productRes, reviewsRes] = await Promise.all([
-                axios.get(`${API_URL}/api/products/${id}`),
-                axios.get(`${API_URL}/api/reviews/${id}`)
+                insforge.db.from('products').select('*, categories(name)').eq('id', id).single(),
+                insforge.db.from('product_reviews').select('*, users(full_name)').eq('product_id', id).order('created_at', { ascending: false })
             ]);
-            setProduct(productRes.data);
-            setReviews(reviewsRes.data);
+
+            if (productRes.data) {
+                setProduct({
+                    ...productRes.data,
+                    category_name: productRes.data.categories?.name || null,
+                });
+            }
+
+            // Map review data for compatibility
+            const mappedReviews = (reviewsRes.data || []).map(r => ({
+                ...r,
+                full_name: r.users?.full_name || 'Anonymous',
+            }));
+            setReviews(mappedReviews);
         } catch (err) {
             console.error(err);
         } finally {
@@ -48,12 +59,13 @@ const ProductDetail = () => {
         }
         setReviewLoading(true);
         try {
-            await axios.post(`${API_URL}/api/reviews`, {
+            const { error } = await insforge.db.from('product_reviews').insert([{
                 product_id: id,
                 user_id: user.id,
                 rating: newReviewRating,
                 comment: newReviewComment
-            });
+            }]);
+            if (error) throw error;
             setNewReviewComment('');
             setNewReviewRating(5);
             fetchDetails(); // Refresh reviews
