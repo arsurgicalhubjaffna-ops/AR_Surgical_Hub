@@ -120,32 +120,44 @@ const Header: React.FC = () => {
             <div className={`fixed top-0 left-0 w-full h-full bg-black/50 z-[1999] backdrop-blur-md transition-opacity duration-300 ${isMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`} onClick={closeMenu} />
 
             {/* Side Drawer */}
-            <div className={`fixed top-0 right-0 w-[85%] max-w-[320px] h-full bg-white shadow-2xl flex flex-col p-[100px_30px_40px] gap-0 translate-x-full transition-transform duration-400 ease-in-out z-[2000] overflow-y-auto ${isMenuOpen ? 'translate-x-0' : ''}`}>
-                {[
-                    { name: 'Home', path: '/' },
-                    { name: 'Products', path: '/shop' },
-                    { name: 'Categories', path: '/categories' },
-                    { name: 'Knowledge Hub', path: '/blogs' },
-                    { name: 'Careers', path: '/careers' },
-                    { name: 'Get a Quote', path: '/quotes' }
-                ].map((link) => (
-                    <Link key={link.name} to={link.path} onClick={closeMenu} className="text-[1.1rem] font-600 w-full py-5 border-b border-black/8 text-brand-text no-underline transition-colors duration-200 hover:text-brand-green">
-                        {link.name}
-                    </Link>
-                ))}
-                {user && (
-                    <Link to="/my-orders" onClick={closeMenu} className="text-[1.1rem] font-600 w-full py-5 border-b border-black/8 text-brand-text no-underline transition-colors duration-200 hover:text-brand-green">My Orders</Link>
-                )}
-                {user?.role === 'admin' && (
-                    <Link to="/admin" onClick={closeMenu} className="text-[1.1rem] font-bold w-full py-5 border-b border-black/8 text-brand-green no-underline transition-colors duration-200">Admin Dashboard</Link>
-                )}
-                <div className="mt-[30px]">
+            <div className={`fixed top-0 right-0 w-[85%] max-w-[320px] h-full bg-white shadow-2xl flex flex-col pt-20 px-6 pb-10 transition-transform duration-400 ease-in-out z-[2000] overflow-y-auto ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                {/* Internal Close Button */}
+                <button
+                    onClick={closeMenu}
+                    className="absolute top-5 right-5 w-10 h-10 flex items-center justify-center rounded-full bg-brand-bg text-secondary hover:text-brand-green transition-colors"
+                >
+                    <X size={24} />
+                </button>
+
+                <div className="flex flex-col gap-1 mt-4">
+                    {[
+                        { name: 'Home', path: '/' },
+                        { name: 'Products', path: '/shop' },
+                        { name: 'Categories', path: '/categories' },
+                        { name: 'Knowledge Hub', path: '/blogs' },
+                        { name: 'Careers', path: '/careers' },
+                        { name: 'Get a Quote', path: '/quotes' }
+                    ].map((link) => (
+                        <Link key={link.name} to={link.path} onClick={closeMenu} className="text-[1.rem] font-700 w-full py-4.5 border-b border-black/5 text-brand-text no-underline transition-colors duration-200 hover:text-brand-green flex items-center justify-between group">
+                            {link.name}
+                            <div className="w-1.5 h-1.5 rounded-full bg-brand-green opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </Link>
+                    ))}
+                    {user && (
+                        <Link to="/my-orders" onClick={closeMenu} className="text-[1.rem] font-700 w-full py-4.5 border-b border-black/5 text-brand-text no-underline transition-colors duration-200 hover:text-brand-green">My Orders</Link>
+                    )}
+                    {user?.role === 'admin' && (
+                        <Link to="/admin" onClick={closeMenu} className="text-[1.rem] font-800 w-full py-4.5 border-b border-black/5 text-brand-green no-underline transition-colors duration-200">Admin Dashboard</Link>
+                    )}
+                </div>
+
+                <div className="mt-auto">
                     {user ? (
-                        <button onClick={() => { logout(); closeMenu(); }} className="bg-white border-2 border-brand-green text-brand-green text-base font-700 py-3.5 w-full rounded-xl cursor-pointer text-center transition-all duration-200 flex items-center justify-center gap-2 hover:bg-brand-green-light hover:-translate-y-0.5 hover:shadow-sm">
+                        <button onClick={() => { logout(); closeMenu(); }} className="bg-white border-2 border-brand-green text-brand-green text-base font-800 py-3.5 w-full rounded-2xl cursor-pointer text-center transition-all duration-200 flex items-center justify-center gap-2 hover:bg-brand-green-light hover:-translate-y-0.5 hover:shadow-sm">
                             <LogOut size={18} /> Logout
                         </button>
                     ) : (
-                        <Link to="/login" onClick={closeMenu} className="text-[1.1rem] font-600 w-full py-5 border-b border-black/8 text-brand-text no-underline flex items-center gap-2">
+                        <Link to="/login" onClick={closeMenu} className="bg-brand-green text-white text-base font-800 py-3.5 w-full rounded-2xl cursor-pointer text-center no-underline flex items-center justify-center gap-2 hover:bg-brand-green-dark hover:-translate-y-0.5 hover:shadow-lg shadow-brand-green/20">
                             <UserIcon size={18} /> Login / Register
                         </Link>
                     )}
