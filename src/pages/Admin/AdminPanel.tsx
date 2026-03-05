@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     LayoutDashboard, Package, ShoppingBag, Users, LogOut,
-    Search, Bell, Settings, Menu, X, ChevronRight, ClipboardList, MessageSquare
+    Search, Bell, Settings, Menu, X, ChevronRight, ClipboardList, MessageSquare, FileText
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -12,8 +12,9 @@ import AdminSubcategories from './AdminSubcategories';
 import AdminOrders from './AdminOrders';
 import AdminUsers from './AdminUsers';
 import AdminQuotes from './AdminQuotes';
+import AdminBlogs from './AdminBlogs';
 
-type AdminPage = 'dashboard' | 'products' | 'categories' | 'subcategories' | 'orders' | 'users' | 'quotes';
+type AdminPage = 'dashboard' | 'products' | 'categories' | 'subcategories' | 'orders' | 'users' | 'quotes' | 'blogs';
 
 const NAV_ITEMS: { key: AdminPage; label: string; Icon: any }[] = [
     { key: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
@@ -22,6 +23,7 @@ const NAV_ITEMS: { key: AdminPage; label: string; Icon: any }[] = [
     { key: 'subcategories', label: 'Sub-Classes', Icon: ShoppingBag },
     { key: 'orders', label: 'Orders', Icon: ClipboardList },
     { key: 'users', label: 'Users', Icon: Users },
+    { key: 'blogs', label: 'Blogs', Icon: FileText },
     { key: 'quotes', label: 'Quote Requests', Icon: MessageSquare },
 ];
 
@@ -44,6 +46,7 @@ const AdminPanel: React.FC = () => {
             case 'subcategories': return <AdminSubcategories />;
             case 'orders': return <AdminOrders />;
             case 'users': return <AdminUsers />;
+            case 'blogs': return <AdminBlogs />;
             case 'quotes': return <AdminQuotes />;
             default: return <AdminDashboard />;
         }

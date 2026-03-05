@@ -26,17 +26,11 @@ const FEATURES = [
     { icon: <Stethoscope size={26} />, title: 'Expert Consultation', desc: 'Dedicated medical professionals to help you select the right instruments.' },
 ];
 
-/* ── Blog posts ── */
-const BLOGS = [
-    { id: 1, tag: 'Surgery', title: 'Advances in Minimally Invasive Surgical Techniques', author: 'Dr. Arjun Mehta', date: 'Feb 18, 2026', img: 'https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=400&auto=format&fit=crop' },
-    { id: 2, tag: 'Equipment', title: 'How to Choose the Right Surgical Instruments for Your OR', author: 'Dr. Priya Nair', date: 'Feb 12, 2026', img: 'https://images.unsplash.com/photo-1584982751601-97ddc0cb5571?w=400&auto=format&fit=crop' },
-    { id: 3, tag: 'Standards', title: 'ISO 13485: Quality Management in Medical Device Manufacturing', author: 'Rahul Shah', date: 'Feb 05, 2026', img: 'https://images.unsplash.com/photo-1576671081837-49000212a370?w=400&auto=format&fit=crop' },
-];
-
 const Home: React.FC = () => {
     const [featured, setFeatured] = useState<Product[]>([]);
     const [latest, setLatest] = useState<Product[]>([]);
     const [trending, setTrending] = useState<Product[]>([]);
+    const [blogs, setBlogs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -60,8 +54,19 @@ const Home: React.FC = () => {
                 setFeatured(mapped.slice(0, 4));
                 setLatest(mapped.slice(0, 6));
                 setTrending(mapped.slice(0, 4));
+
+                const { data: blogsData, error: blogsError } = await insforge.database
+                    .from('blogs')
+                    .select('*')
+                    .eq('is_published', true)
+                    .order('created_at', { ascending: false })
+                    .limit(3);
+
+                if (!blogsError && blogsData) {
+                    setBlogs(blogsData);
+                }
             } catch (e) {
-                console.error('Failed to load products:', e);
+                console.error('Failed to load home data:', e);
             }
             setLoading(false);
         };
@@ -324,27 +329,41 @@ const Home: React.FC = () => {
                             <span className="inline-block bg-brand-green/12 text-brand-green border border-brand-green/25 rounded-full px-3.5 py-1.25 text-[0.74rem] font-700 uppercase tracking-widest mb-1">Knowledge Hub</span>
                             <h2 className="text-[1.8rem] font-800 tracking-tighter mt-1">Latest Blogs</h2>
                         </div>
-                        <Link to="/" className="inline-flex items-center gap-1 text-[0.85rem] font-600 text-brand-green border-1.5 border-brand-green/25 px-4 py-1.75 rounded-lg transition-all duration-200 hover:bg-brand-green hover:text-white no-underline">View All <ChevronRight size={16} /></Link>
+                        <Link to="/blogs" className="inline-flex items-center gap-1 text-[0.85rem] font-600 text-brand-green border-1.5 border-brand-green/25 px-4 py-1.75 rounded-lg transition-all duration-200 hover:bg-brand-green hover:text-white no-underline">View All <ChevronRight size={16} /></Link>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {BLOGS.map(b => (
-                            <article key={b.id} className="bg-white border border-black/8 rounded-2xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:border-brand-green/25 group">
-                                <div className="relative aspect-video overflow-hidden">
-                                    <img src={b.img} alt={b.title} className="w-full h-full object-cover transition-transform duration-400 group-hover:scale-105" />
-                                    <span className="absolute top-3 left-3 bg-brand-green text-white text-[0.66rem] font-700 uppercase tracking-tight px-2 py-0.75 rounded">
-                                        {b.tag}
-                                    </span>
-                                </div>
-                                <div className="p-5">
-                                    <p className="text-[0.78rem] text-gray-400 mb-2">{b.author} · {b.date}</p>
-                                    <h3 className="text-base font-700 leading-[1.4] mb-3.5 text-brand-text group-hover:text-brand-green transition-colors">{b.title}</h3>
-                                    <Link to="/" className="inline-flex items-center gap-1 text-brand-green text-[0.84rem] font-600 transition-all duration-200 hover:gap-2 hover:text-brand-green-dark no-underline">
-                                        Read More <ChevronRight size={14} />
+                    {blogs.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {blogs.map(b => (
+                                <article key={b.id} className="bg-white border border-black/8 rounded-2xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:border-brand-green/25 group flex flex-col">
+                                    <Link to={`/blog/${b.id}`} className="relative aspect-video overflow-hidden shrink-0 block">
+                                        <ProductImage
+                                            src={b.featured_image}
+                                            alt={b.title}
+                                            className="w-full h-full object-cover transition-transform duration-400 group-hover:scale-105"
+                                        />
+                                        {b.tag && (
+                                            <span className="absolute top-3 left-3 bg-brand-green text-white text-[0.66rem] font-700 uppercase tracking-tight px-2 py-0.75 rounded">
+                                                {b.tag}
+                                            </span>
+                                        )}
                                     </Link>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
+                                    <div className="p-5 flex-1 flex flex-col">
+                                        <p className="text-[0.78rem] text-gray-400 mb-2">
+                                            {b.author_name} · {new Date(b.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                        </p>
+                                        <h3 className="text-base font-700 leading-[1.4] mb-3.5 text-brand-text group-hover:text-brand-green transition-colors line-clamp-2">
+                                            <Link to={`/blog/${b.id}`}>{b.title}</Link>
+                                        </h3>
+                                        <Link to={`/blog/${b.id}`} className="mt-auto inline-flex items-center gap-1 text-brand-green text-[0.84rem] font-600 transition-all duration-200 hover:gap-2 hover:text-brand-green-dark no-underline w-fit">
+                                            Read More <ChevronRight size={14} />
+                                        </Link>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    ) : !loading ? (
+                        <div className="text-center py-10 text-gray-400 text-[0.95rem]">No blog posts available yet.</div>
+                    ) : null}
                 </div>
             </section>
 

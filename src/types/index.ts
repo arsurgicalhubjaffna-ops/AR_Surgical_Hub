@@ -70,3 +70,16 @@ export interface Order {
         email: string;
     };
 }
+
+export interface Blog {
+    id: string;
+    title: string;
+    content: string;
+    author_name: string;
+    author_image?: string;
+    featured_image?: string;
+    tag?: string;
+    is_published: boolean;
+    created_at: string;
+    updated_at: string;
+}

@@ -11,6 +11,8 @@ import Careers from './pages/Careers';
 import Categories from './pages/Categories';
 import ProductDetail from './pages/ProductDetail';
 import Wishlist from './pages/Wishlist';
+import Blogs from './pages/Blogs';
+import BlogDetail from './pages/BlogDetail';
 import AdminPanel from './pages/Admin/AdminPanel';
 import AdminRoute from './pages/Admin/AdminRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -45,6 +47,8 @@ function App() {
                     <Route path="/wishlist" element={<Wishlist />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/quotes" element={<Quotes />} />
+                    <Route path="/blogs" element={<Blogs />} />
+                    <Route path="/blog/:id" element={<BlogDetail />} />
                     <Route path="/careers" element={<Careers />} />
                     <Route path="/login" element={<Login />} />
                   </Routes>
