@@ -130,12 +130,13 @@ const Shop: React.FC = () => {
                     </aside>
 
                     {/* Mobile Horizontal scroll for categories */}
-                    <div className="lg:hidden mb-6 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-none">
-                        <div className="flex flex-col gap-3">
-                            <div className="flex gap-2.5">
+                    <div className="lg:hidden mb-10 -mx-5 px-5">
+                        <div className="flex flex-col gap-6">
+                            {/* Categories Row */}
+                            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
                                 <Link
                                     to="/shop"
-                                    className={`shrink-0 px-5 py-2.5 rounded-xl text-sm whitespace-nowrap border no-underline transition-all ${!categoryId ? 'bg-brand-green text-white border-brand-green font-700 shadow-lg shadow-brand-green/20' : 'bg-brand-surface border-brand-border text-brand-text-muted'}`}
+                                    className={`shrink-0 px-5 py-3 rounded-2xl text-sm whitespace-nowrap border no-underline transition-all duration-200 ${!categoryId ? 'bg-brand-green text-white border-brand-green font-800 shadow-lg shadow-brand-green/20' : 'bg-white border-black/8 text-secondary font-600'}`}
                                 >
                                     All Products
                                 </Link>
@@ -143,31 +144,36 @@ const Shop: React.FC = () => {
                                     <Link
                                         key={cat.id}
                                         to={`/shop?category=${cat.id}`}
-                                        className={`shrink-0 px-4 py-2 rounded-lg text-sm whitespace-nowrap border no-underline transition-all ${categoryId === cat.id ? 'bg-brand-green text-white border-brand-green font-600 shadow-md shadow-brand-green/20' : 'bg-white border-black/8 text-secondary'}`}
+                                        className={`shrink-0 px-5 py-3 rounded-2xl text-sm whitespace-nowrap border no-underline transition-all duration-200 ${categoryId === cat.id ? 'bg-brand-green text-white border-brand-green font-800 shadow-lg shadow-brand-green/20' : 'bg-white border-black/8 text-secondary font-600'}`}
                                     >
                                         {cat.name}
                                     </Link>
                                 ))}
                             </div>
 
-                            {/* Subcategories mobile scroll */}
+                            {/* Subcategories Row */}
                             {categoryId && subcategories.length > 0 && (
-                                <div className="flex gap-2.5 border-t border-brand-border pt-3">
-                                    <Link
-                                        to={`/shop?category=${categoryId}`}
-                                        className={`shrink-0 px-4 py-1.5 rounded-lg text-[0.8rem] whitespace-nowrap border no-underline transition-all ${!subcategoryId ? 'bg-brand-green/10 text-brand-green border-brand-green/20 font-700' : 'bg-transparent border-transparent text-gray-400'}`}
-                                    >
-                                        All in {categories.find(c => c.id === categoryId)?.name || 'Category'}
-                                    </Link>
-                                    {subcategories.map((sub) => (
+                                <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div className="flex items-center justify-between px-1">
+                                        <h4 className="text-[0.65rem] font-800 uppercase tracking-widest text-brand-text-muted">Explore Sub-types</h4>
+                                    </div>
+                                    <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
                                         <Link
-                                            key={sub.id}
-                                            to={`/shop?category=${categoryId}&subcategory=${sub.id}`}
-                                            className={`shrink-0 px-4 py-1.5 rounded-lg text-[0.8rem] whitespace-nowrap border no-underline transition-all ${subcategoryId === sub.id ? 'bg-brand-green/10 text-brand-green border-brand-green/20 font-700' : 'bg-white border-black/8 text-secondary'}`}
+                                            to={`/shop?category=${categoryId}`}
+                                            className={`shrink-0 px-4 py-2 rounded-xl text-[0.8rem] whitespace-nowrap border no-underline transition-all duration-200 ${!subcategoryId ? 'bg-brand-green-light text-brand-green border-brand-green/20 font-800' : 'bg-white border-black/5 text-gray-400 font-700'}`}
                                         >
-                                            {sub.name}
+                                            View All
                                         </Link>
-                                    ))}
+                                        {subcategories.map((sub) => (
+                                            <Link
+                                                key={sub.id}
+                                                to={`/shop?category=${categoryId}&subcategory=${sub.id}`}
+                                                className={`shrink-0 px-4 py-2 rounded-xl text-[0.8rem] whitespace-nowrap border no-underline transition-all duration-200 ${subcategoryId === sub.id ? 'bg-brand-green-light text-brand-green border-brand-green/20 font-800' : 'bg-white border-black/5 text-gray-400 font-700'}`}
+                                            >
+                                                {sub.name}
+                                            </Link>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
