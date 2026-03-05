@@ -49,12 +49,18 @@ const AdminDashboard: React.FC = () => {
         loadStats();
     }, []);
 
-    if (loading) return <div className="text-secondary italic animate-pulse">Synchronizing dashboard data...</div>;
+    if (loading) return (
+        <div className="flex items-center justify-center p-20">
+            <div className="text-brand-green-dark animate-pulse font-700 tracking-tight flex items-center gap-3">
+                <Package className="animate-bounce" /> Synchronizing dashboard data...
+            </div>
+        </div>
+    );
 
     const StatCard = ({ title, value, icon: Icon, color, trend }: any) => (
-        <div className="bg-white p-8 rounded-[24px] border border-black/5 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 group">
+        <div className="bg-brand-surface p-6 md:p-8 rounded-[24px] border border-brand-border shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 group">
             <div className="flex justify-between items-start mb-6">
-                <div className={`p-4 rounded-2xl ${color} text-white shadow-lg`}>
+                <div className={`p-4 rounded-2xl ${color} text-white shadow-lg shadow-current/20`}>
                     <Icon size={24} />
                 </div>
                 {trend && (
@@ -115,8 +121,8 @@ const AdminDashboard: React.FC = () => {
                                     <td className="px-8 py-5 font-800 text-brand-text text-sm font-header">${Number(o.total_amount).toFixed(2)}</td>
                                     <td className="px-8 py-5">
                                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-[0.65rem] font-800 uppercase tracking-widest ${o.status === 'completed' ? 'bg-brand-green/10 text-brand-green' :
-                                                o.status === 'pending' ? 'bg-amber-500/10 text-amber-500' :
-                                                    'bg-brand-red/10 text-brand-red'
+                                            o.status === 'pending' ? 'bg-amber-500/10 text-amber-500' :
+                                                'bg-brand-red/10 text-brand-red'
                                             }`}>
                                             {o.status}
                                         </span>

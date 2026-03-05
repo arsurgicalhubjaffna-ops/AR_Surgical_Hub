@@ -68,20 +68,20 @@ const Login: React.FC = () => {
         }
     };
 
-    const inputClasses = "w-full bg-transparent border-none text-brand-text placeholder-gray-400 outline-none text-[0.93rem] font-500 py-1";
-    const groupClasses = "flex items-center gap-3 bg-brand-bg border-1.5 border-black/8 px-4 py-3 rounded-xl transition-all focus-within:border-brand-green focus-within:shadow-[0_0_0_4px_rgba(0,181,164,0.1)] focus-within:bg-white mb-4";
+    const inputClasses = "w-full bg-transparent border-none text-brand-text placeholder-brand-text-muted outline-none text-[0.93rem] font-500 py-1";
+    const groupClasses = "flex items-center gap-3 bg-brand-bg border-1.5 border-brand-border px-4 py-3 rounded-xl transition-all focus-within:border-brand-green focus-within:shadow-[0_0_0_4px_var(--color-brand-green-light)] focus-within:bg-white mb-4";
 
     // ─── Verification Code Screen ───
     if (showVerify) {
         return (
             <div className="min-h-[85vh] flex items-center justify-center bg-brand-bg px-5 py-12">
-                <div className="w-full max-w-[440px] bg-white border border-black/8 rounded-[32px] p-8 md:p-12 shadow-sm">
+                <div className="w-full max-w-[440px] bg-white border border-brand-border rounded-[32px] p-8 md:p-12 shadow-sm">
                     <div className="text-center mb-10">
                         <div className="w-16 h-16 bg-brand-green-light rounded-full flex items-center justify-center text-brand-green mx-auto mb-6">
                             <KeyRound size={32} />
                         </div>
                         <h2 className="text-2xl font-800 tracking-tighter text-brand-text mb-2">Verify Your Email</h2>
-                        <p className="text-secondary text-sm leading-relaxed">
+                        <p className="text-brand-text-muted text-sm leading-relaxed">
                             Enter the 6-digit code sent to <br /><strong className="text-brand-text">{verifyEmail}</strong>
                         </p>
                     </div>
@@ -111,7 +111,7 @@ const Login: React.FC = () => {
                         <button onClick={handleResend} className="text-brand-green font-700 text-sm flex items-center gap-1.5 hover:underline">
                             <RefreshCw size={14} /> Resend Code
                         </button>
-                        <button onClick={() => { setShowVerify(false); setOtp(''); }} className="text-gray-400 font-600 text-sm hover:text-brand-text transition-colors">
+                        <button onClick={() => { setShowVerify(false); setOtp(''); }} className="text-brand-text-muted font-600 text-sm hover:text-brand-text transition-colors">
                             ← Back to Signup
                         </button>
                     </div>
@@ -122,18 +122,18 @@ const Login: React.FC = () => {
 
     return (
         <div className="min-h-[85vh] flex items-center justify-center bg-brand-bg px-5 py-12">
-            <div className="w-full max-w-[440px] bg-white border border-black/8 rounded-[32px] p-8 md:p-12 shadow-sm">
+            <div className="w-full max-w-[440px] bg-white border border-brand-border rounded-[32px] p-8 md:p-12 shadow-sm">
 
                 {/* Tabs */}
-                <div className="flex bg-brand-bg border border-black/8 rounded-xl p-1 mb-10">
+                <div className="flex bg-brand-bg border border-brand-border rounded-xl p-1 mb-10">
                     <button
-                        className={`flex-1 py-2.5 rounded-lg text-[0.85rem] font-700 transition-all ${isLogin ? 'bg-brand-green text-white shadow-md shadow-brand-green/20' : 'text-gray-400 hover:text-brand-text'}`}
+                        className={`flex-1 py-2.5 rounded-lg text-[0.85rem] font-700 transition-all ${isLogin ? 'bg-brand-green text-white shadow-md shadow-brand-green/20' : 'text-brand-text-muted hover:text-brand-text'}`}
                         onClick={() => setIsLogin(true)}
                     >
                         Sign In
                     </button>
                     <button
-                        className={`flex-1 py-2.5 rounded-lg text-[0.85rem] font-700 transition-all ${!isLogin ? 'bg-brand-green text-white shadow-md shadow-brand-green/20' : 'text-gray-400 hover:text-brand-text'}`}
+                        className={`flex-1 py-2.5 rounded-lg text-[0.85rem] font-700 transition-all ${!isLogin ? 'bg-brand-green text-white shadow-md shadow-brand-green/20' : 'text-brand-text-muted hover:text-brand-text'}`}
                         onClick={() => setIsLogin(false)}
                     >
                         Sign Up
@@ -144,7 +144,7 @@ const Login: React.FC = () => {
                     <h2 className="text-2xl md:text-3xl font-800 tracking-tighter text-brand-text mb-2">
                         {isLogin ? 'Welcome Back' : 'Create Account'}
                     </h2>
-                    <p className="text-secondary text-sm">
+                    <p className="text-brand-text-muted text-sm">
                         {isLogin ? 'Securely access your surgical hub account' : 'Join AR Surgical Hub for professional medical solutions'}
                     </p>
                 </div>
@@ -153,7 +153,7 @@ const Login: React.FC = () => {
                     {!isLogin && (
                         <>
                             <div className={groupClasses}>
-                                <User size={18} className="text-gray-400" />
+                                <User size={18} className="text-brand-text-muted" />
                                 <input
                                     type="text"
                                     placeholder="Full Name"
@@ -164,7 +164,7 @@ const Login: React.FC = () => {
                                 />
                             </div>
                             <div className={groupClasses}>
-                                <Phone size={18} className="text-gray-400" />
+                                <Phone size={18} className="text-brand-text-muted" />
                                 <input
                                     type="text"
                                     placeholder="Phone Number"
@@ -176,7 +176,7 @@ const Login: React.FC = () => {
                         </>
                     )}
                     <div className={groupClasses}>
-                        <Mail size={18} className="text-gray-400" />
+                        <Mail size={18} className="text-brand-text-muted" />
                         <input
                             type="email"
                             placeholder="Email Address"
@@ -187,7 +187,7 @@ const Login: React.FC = () => {
                         />
                     </div>
                     <div className={groupClasses}>
-                        <Lock size={18} className="text-gray-400" />
+                        <Lock size={18} className="text-brand-text-muted" />
                         <input
                             type="password"
                             placeholder="Password"
@@ -207,7 +207,7 @@ const Login: React.FC = () => {
                 </form>
 
                 <div className="mt-10 text-center">
-                    <p className="text-[0.88rem] text-secondary">
+                    <p className="text-[0.88rem] text-brand-text-muted">
                         {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
                         <button onClick={() => setIsLogin(!isLogin)} className="text-brand-green font-800 hover:underline inline-block ml-1">
                             {isLogin ? 'Create one' : 'Login here'}

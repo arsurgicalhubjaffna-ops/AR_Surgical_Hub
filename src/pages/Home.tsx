@@ -71,9 +71,9 @@ const Home: React.FC = () => {
         <div className="bg-brand-bg font-primary overflow-x-hidden">
 
             {/* HERO BANNER */}
-            <section className="bg-linear-[135deg,#e8f8f6_0%,#d4f0ec_60%,#e0f5f2_100%] py-18 md:py-24 overflow-hidden relative">
+            <section className="bg-linear-[135deg,var(--color-brand-green-light)_0%,#d4f0ec_60%,#e0f5f2_100%] py-12 md:py-24 overflow-hidden relative">
                 <div className="max-w-[1400px] mx-auto px-5 md:px-10">
-                    <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_auto] items-center gap-12 text-center lg:text-left">
+                    <div className="grid grid-cols-1 lg:grid-cols-[1.8fr_auto_auto] items-center gap-12 text-center lg:text-left">
 
                         {/* Left: text */}
                         <div className="flex-1">
@@ -89,7 +89,7 @@ const Home: React.FC = () => {
                                 medical professionals. Engineering excellence in every cut.
                             </p>
                             <div className="flex flex-wrap gap-4 justify-center lg:justify-start mt-8">
-                                <Link to="/shop" className="inline-flex items-center gap-2 bg-brand-green text-white px-7 py-3.5 rounded-xl font-600 no-underline transition-all duration-200 border-1.5 border-brand-green hover:bg-brand-green-dark hover:-translate-y-0.5 hover:shadow-brand-green shadow-sm">
+                                <Link to="/shop" className="inline-flex items-center gap-2 bg-brand-green text-white px-7 py-3.5 rounded-xl font-600 no-underline transition-all duration-200 border-1.5 border-brand-green hover:bg-brand-green-dark hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-green/20 shadow-sm">
                                     Explore Products <ArrowRight size={17} />
                                 </Link>
                                 <Link to="/quotes" className="inline-flex items-center bg-white text-brand-green px-7 py-3.5 rounded-xl font-600 no-underline transition-all duration-200 border-1.5 border-brand-green hover:bg-brand-green-light hover:-translate-y-0.5 shadow-sm">
@@ -138,12 +138,12 @@ const Home: React.FC = () => {
             </section>
 
             {/* TRUST BAR */}
-            <section className="bg-white border-y border-black/8 py-4.5">
+            <section className="bg-white border-y border-brand-border py-6">
                 <div className="max-w-[1400px] mx-auto px-5 md:px-10">
-                    <div className="flex flex-wrap items-center justify-between gap-5 text-secondary">
+                    <div className="flex flex-wrap items-center justify-between gap-6 md:gap-8 text-brand-text-muted">
                         {TRUST_ITEMS.map((t, i) => (
-                            <div key={i} className="flex items-center gap-2.5 text-[0.87rem] font-600">
-                                <span className="w-10 h-10 rounded-full bg-brand-green-light flex items-center justify-center text-brand-green shrink-0">{t.icon}</span>
+                            <div key={i} className="flex items-center gap-3 text-[0.88rem] font-600 transition-colors hover:text-brand-green">
+                                <span className="w-11 h-11 rounded-full bg-brand-green-light flex items-center justify-center text-brand-green shrink-0 shadow-sm">{t.icon}</span>
                                 <span>{t.label}</span>
                             </div>
                         ))}
@@ -155,10 +155,10 @@ const Home: React.FC = () => {
             <section className="py-20 bg-white">
                 <div className="max-w-[1400px] mx-auto px-5 md:px-10 grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-20 items-center">
                     <div className="flex items-center justify-center relative">
-                        <div className="relative w-[220px] h-[220px] flex items-center justify-center">
-                            <ShieldCheck size={64} className="text-brand-green relative z-[2]" />
+                        <div className="relative w-[180px] h-[180px] md:w-[220px] md:h-[220px] flex items-center justify-center">
+                            <ShieldCheck size={64} className="text-brand-green relative z-[2] md:w-16 md:h-16 w-12 h-12" />
                             <div className="absolute inset-0 border-2 border-brand-green/25 rounded-full animate-[ping_2.5s_infinite]" />
-                            <div className="absolute inset-[-20px] border-2 border-brand-green/10 rounded-full animate-[ping_3s_infinite]" />
+                            <div className="absolute inset-[-15px] md:inset-[-20px] border-2 border-brand-green/10 rounded-full animate-[ping_3s_infinite]" />
                         </div>
                     </div>
                     <div className="text-center lg:text-left">
@@ -209,9 +209,9 @@ const Home: React.FC = () => {
             </section>
 
             {/* PROMO STRIP */}
-            <section className="py-10 bg-white">
+            <section className="py-10 bg-brand-surface">
                 <div className="max-w-[1400px] mx-auto px-5 md:px-10">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 bg-linear-[130deg,#00b5a4_0%,#008f81_100%] rounded-[20px] overflow-hidden p-12 lg:px-14 relative group">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 bg-linear-[130deg,var(--color-brand-green)_0%,var(--color-brand-green-dark)_100%] rounded-[24px] overflow-hidden p-8 md:p-12 lg:px-14 relative group shadow-xl shadow-brand-green/10">
                         <div className="absolute right-[-60px] top-[-60px] w-60 h-60 rounded-full bg-white/7 pointer-events-none group-hover:scale-110 transition-transform duration-700" />
                         <div className="flex-1 text-center md:text-left">
                             <span className="inline-block bg-white/20 text-white text-[0.7rem] font-700 uppercase tracking-widest px-3 py-1 rounded-full mb-3.5">Limited Offer</span>
@@ -255,7 +255,7 @@ const Home: React.FC = () => {
             {/* PROMO WIDE */}
             <section className="py-12 bg-brand-bg">
                 <div className="max-w-[1400px] mx-auto px-5 md:px-10">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-12 bg-[#f0faf9] border border-brand-green/25 rounded-[20px] p-12 lg:px-15 overflow-hidden">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-12 bg-brand-green-light border border-brand-green/20 rounded-[24px] p-8 md:p-12 lg:px-15 overflow-hidden shadow-sm">
                         <div className="text-center md:text-left">
                             <span className="inline-block bg-white/15 text-brand-green border border-brand-green/25 px-3 py-1 rounded-full text-[0.7rem] font-700 uppercase tracking-widest mb-3.5">Safety First</span>
                             <h2 className="text-[2.2rem] font-800 leading-[1.2] my-3.5 tracking-tighter">Grade A Safety Masks<br />for Sale Every Day!</h2>

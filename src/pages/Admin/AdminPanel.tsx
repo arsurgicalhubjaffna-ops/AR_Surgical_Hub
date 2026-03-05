@@ -49,18 +49,18 @@ const AdminPanel: React.FC = () => {
     const pageTitle = NAV_ITEMS.find(i => i.key === activePage)?.label || 'Admin Panel';
 
     return (
-        <div className="flex h-screen bg-[#f8fafc]">
+        <div className="flex h-screen bg-brand-bg">
             {/* Sidebar */}
             <aside
                 className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#0f172a] text-white transition-all duration-300 ease-in-out transform shadow-2xl ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-20'}`}
             >
                 {/* Logo Section */}
                 <div className="h-20 flex items-center px-6 border-b border-white/5">
-                    <img src="/ar.svg" alt="AR" className="w-10 h-10 shrink-0" />
+                    <img src="/ar.svg" alt="AR" className="w-10 h-10 shrink-0 brightness-0 invert opacity-90" />
                     {sidebarOpen && (
                         <div className="ml-3 overflow-hidden whitespace-nowrap">
                             <h2 className="text-lg font-800 tracking-tighter text-white">AR SURGICAL</h2>
-                            <span className="text-[0.65rem] font-700 uppercase tracking-widest text-brand-green">Advanced Hub</span>
+                            <span className="text-[0.65rem] font-700 uppercase tracking-widest text-brand-blue">Advanced Hub</span>
                         </div>
                     )}
                 </div>

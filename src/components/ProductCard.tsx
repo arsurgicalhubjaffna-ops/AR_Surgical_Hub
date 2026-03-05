@@ -17,11 +17,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     return (
         <div className="bg-white border border-black/8 rounded-xl overflow-hidden flex flex-col transition-all duration-280 hover:shadow-lg hover:-translate-y-1 hover:border-brand-green/25 peer">
             {/* Image area */}
-            <div className="relative overflow-hidden bg-gray-50 aspect-[4/3] group">
+            <div className="relative overflow-hidden bg-brand-bg aspect-[4/3] group">
                 <img
                     src={product.image_url || `https://via.placeholder.com/280x200/e8f8f6/00b5a4?text=${encodeURIComponent(product.name || 'Product')}`}
                     alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-400 group-hover:scale-107"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
                 {/* Category badge */}
@@ -56,11 +56,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 </Link>
 
                 {/* Rating (decorative) */}
-                <div className="flex items-center gap-0.25">
+                <div className="flex items-center gap-0.5">
                     {[1, 2, 3, 4, 5].map(i => (
-                        <span key={i} className={`text-[0.8rem] ${i <= 4 ? 'text-amber-400' : 'text-gray-300'}`}>★</span>
+                        <span key={i} className={`text-[0.85rem] ${i <= 4 ? 'text-brand-blue' : 'text-brand-border'}`}>★</span>
                     ))}
-                    <span className="text-[0.72rem] text-gray-400 ml-1">(24)</span>
+                    <span className="text-[0.75rem] text-brand-text-muted ml-1.5">(24)</span>
                 </div>
 
                 {/* Price + Cart */}

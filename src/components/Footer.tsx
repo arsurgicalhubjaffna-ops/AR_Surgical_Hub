@@ -4,24 +4,27 @@ import { Phone, Mail, MapPin, Facebook, Twitter, Instagram, Youtube } from 'luci
 
 const Footer: React.FC = () => {
     return (
-        <footer className="bg-[#1a2e2d] pt-[70px] mt-0">
+        <footer className="bg-brand-footer pt-16 md:pt-20 mt-0">
             <div className="max-w-[1400px] mx-auto px-5 md:px-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr_1.4fr] gap-12 pb-14 border-b border-white/5">
 
                     {/* Brand */}
                     <div className="flex flex-col">
-                        <Link to="/" className="flex items-center gap-2.5 mb-4 no-underline">
-                            <img src="/ar.svg" alt="AR Surgical Hub" className="h-[34px] brightness-0 invert opacity-90" />
-                            <span className="font-header text-[1.05rem] font-700 text-white">Surgical Hub</span>
+                        <Link to="/" className="flex items-center gap-2.5 mb-6 no-underline transition-opacity hover:opacity-80">
+                            <img src="/ar.svg" alt="AR Surgical Hub" className="h-[38px] brightness-0 invert opacity-90" />
+                            <div className="flex flex-col leading-none">
+                                <span className="font-header text-[1.1rem] font-800 text-white tracking-tighter">AR SURGICAL</span>
+                                <span className="text-[0.65rem] font-700 text-brand-blue uppercase tracking-widest mt-0.5">Surgical Hub</span>
+                            </div>
                         </Link>
                         <p className="text-white/50 text-[0.87rem] leading-[1.75] mb-5.5 max-w-[300px]">
                             Leading provider of precision surgical instruments and medical equipment.
                             Quality and trust since 1995, serving healthcare professionals worldwide.
                         </p>
                         {/* Contact */}
-                        <div className="flex flex-col gap-2 mb-5.5 text-white/50 text-[0.84rem]">
-                            <div className="flex items-start gap-2">
-                                <Phone size={15} className="text-brand-green shrink-0 mt-0.5" />
+                        <div className="flex flex-col gap-3 mb-6 text-white/50 text-[0.87rem]">
+                            <div className="flex items-start gap-2.5">
+                                <Phone size={16} className="text-brand-blue shrink-0 mt-0.5" />
                                 <span>+1 (555) 123-4567</span>
                             </div>
                             <div className="flex items-start gap-2">
