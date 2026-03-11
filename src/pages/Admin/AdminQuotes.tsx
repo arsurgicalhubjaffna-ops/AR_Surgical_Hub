@@ -87,7 +87,7 @@ const AdminQuotes: React.FC = () => {
                                         <span className="font-700 text-brand-text text-sm">{q.full_name || 'Anonymous Practitioner'}</span>
                                         <div className="flex items-center gap-1.5 text-[0.7rem] text-gray-400 font-500 mt-0.5">
                                             <Mail size={12} className="text-gray-300" />
-                                            {q.email || 'no-email@arsurgical.com'}
+                                            {q.email || 'no-email@arsurgicalhub.com'}
                                         </div>
                                     </div>
                                 </td>

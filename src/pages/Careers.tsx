@@ -44,7 +44,7 @@ const Careers: React.FC = () => {
                         Join Our <span className="text-brand-green">Team</span>
                     </h1>
                     <p className="text-secondary text-base md:text-lg max-w-2xl mx-auto">
-                        Build the future of surgical precision and medical excellence with AR Surgical Hub.
+                        Build the future of surgical precision and medical excellence with AR SURGICAL HUB.
                     </p>
                 </div>
             </div>

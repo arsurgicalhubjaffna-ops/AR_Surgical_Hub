@@ -171,7 +171,7 @@ const Home: React.FC = () => {
                         <span className="inline-block bg-brand-green/12 text-brand-green border border-brand-green/25 rounded-full px-3.5 py-1.25 text-[0.74rem] font-700 uppercase tracking-widest mb-3">Why Choose Us</span>
                         <h2 className="text-[2.2rem] font-800 leading-tight mb-4 tracking-tighter text-brand-text">Your Faithful Partner<br /><span className="text-brand-green">in Medical Goods</span></h2>
                         <p className="text-brand-text/70 text-[0.97rem] leading-[1.75] mb-8 max-w-[500px] mx-auto lg:mx-0">
-                            AR Surgical Hub has been a trusted supplier for hospitals, clinics, and
+                            AR SURGICAL HUB has been a trusted supplier for hospitals, clinics, and
                             surgical centers worldwide since 1995. Every instrument is precision-crafted
                             from medical-grade materials and undergoes rigorous quality testing.
                         </p>
@@ -304,7 +304,7 @@ const Home: React.FC = () => {
                 <div className="max-w-[1400px] mx-auto px-5 md:px-10">
                     <div className="text-center mb-12">
                         <span className="inline-block bg-brand-green/12 text-brand-green border border-brand-green/25 rounded-full px-3.5 py-1.25 text-[0.74rem] font-700 uppercase tracking-widest mb-3.5">Our Strengths</span>
-                        <h2 className="text-[2rem] font-800 mb-2.5">Why Choose <span className="text-brand-green">AR Surgical</span>?</h2>
+                        <h2 className="text-[2rem] font-800 mb-2.5">Why Choose <span className="text-brand-green">AR SURGICAL</span>?</h2>
                         <p className="text-secondary max-w-lg mx-auto text-[0.97rem]">We combine traditional craftsmanship with modern precision engineering.</p>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5.5">

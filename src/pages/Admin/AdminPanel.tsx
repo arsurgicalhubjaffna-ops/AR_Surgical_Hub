@@ -75,7 +75,7 @@ const AdminPanel: React.FC = () => {
                         {(sidebarOpen || !sidebarOpen) && sidebarOpen && (
                             <div className="ml-3 overflow-hidden whitespace-nowrap">
                                 <h2 className="text-lg font-800 tracking-tighter text-white">AR SURGICAL</h2>
-                                <span className="text-[0.65rem] font-700 uppercase tracking-widest text-brand-blue">Advanced Hub</span>
+                                <span className="text-[0.65rem] font-700 uppercase tracking-widest text-brand-blue">SURGICAL HUB</span>
                             </div>
                         )}
                     </div>

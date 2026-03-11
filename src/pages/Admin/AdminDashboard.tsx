@@ -116,7 +116,7 @@ const AdminDashboard: React.FC = () => {
                                     <td className="px-8 py-5">
                                         <div className="flex flex-col gap-0.5">
                                             <span className="font-700 text-brand-text text-sm">{o.full_name || 'Guest User'}</span>
-                                            <span className="text-[0.7rem] text-gray-400">{o.email || 'no-email@arsurgical.com'}</span>
+                                            <span className="text-[0.7rem] text-gray-400">{o.email || 'no-email@arsurgicalhub.com'}</span>
                                             {o.phone && <span className="text-[0.7rem] text-brand-green font-600 tracking-tight mt-0.5">{o.phone}</span>}
                                         </div>
                                     </td>

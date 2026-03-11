@@ -216,7 +216,7 @@ const Checkout: React.FC = () => {
                             <div className="flex items-center gap-2 text-[0.7rem] text-brand-green font-700 uppercase tracking-widest">
                                 <ShieldCheck size={14} /> Secure Checkout
                             </div>
-                            <p className="text-center text-[0.72rem] text-gray-400">By placing an order, you agree to AR Surgical Hub's terms and conditions.</p>
+                            <p className="text-center text-[0.72rem] text-gray-400">By placing an order, you agree to AR SURGICAL HUB's terms and conditions.</p>
                         </div>
                     </aside>
                 </form>

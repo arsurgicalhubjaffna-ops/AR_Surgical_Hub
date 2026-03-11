@@ -145,7 +145,7 @@ const Login: React.FC = () => {
                         {isLogin ? 'Welcome Back' : 'Create Account'}
                     </h2>
                     <p className="text-brand-text-muted text-sm">
-                        {isLogin ? 'Securely access your surgical hub account' : 'Join AR Surgical Hub for professional medical solutions'}
+                        {isLogin ? 'Securely access your surgical hub account' : 'Join AR SURGICAL HUB for professional medical solutions'}
                     </p>
                 </div>
 

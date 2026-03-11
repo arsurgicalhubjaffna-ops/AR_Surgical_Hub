@@ -11,10 +11,10 @@ const Footer: React.FC = () => {
                     {/* Brand */}
                     <div className="flex flex-col">
                         <Link to="/" className="flex items-center gap-2.5 mb-6 no-underline transition-opacity hover:opacity-80">
-                            <img src="/ar.svg" alt="AR Surgical Hub" className="h-[38px] brightness-0 invert opacity-90" />
+                            <img src="/ar.svg" alt="AR SURGICAL HUB" className="h-[38px] brightness-0 invert opacity-90" />
                             <div className="flex flex-col leading-none">
                                 <span className="font-header text-[1.1rem] font-800 text-white tracking-tighter">AR SURGICAL</span>
-                                <span className="text-[0.65rem] font-700 text-brand-blue uppercase tracking-widest mt-0.5">Surgical Hub</span>
+                                <span className="text-[0.65rem] font-700 text-brand-blue uppercase tracking-widest mt-0.5">SURGICAL HUB</span>
                             </div>
                         </Link>
                         <p className="text-white/50 text-[0.87rem] leading-[1.75] mb-5.5 max-w-[300px]">
@@ -25,15 +25,15 @@ const Footer: React.FC = () => {
                         <div className="flex flex-col gap-3 mb-6 text-white/50 text-[0.87rem]">
                             <div className="flex items-start gap-2.5">
                                 <Phone size={16} className="text-brand-blue shrink-0 mt-0.5" />
-                                <span>+1 (555) 123-4567</span>
+                                <span>+94 77 0700 737</span>
                             </div>
                             <div className="flex items-start gap-2">
                                 <Mail size={15} className="text-brand-green shrink-0 mt-0.5" />
-                                <span>support@arsurgical.com</span>
+                                <span>support@arsurgicalhub.com</span>
                             </div>
                             <div className="flex items-start gap-2">
                                 <MapPin size={15} className="text-brand-green shrink-0 mt-0.5" />
-                                <span>123 Medical District, NY 10001</span>
+                                <span>158A, Hospital Road Jaffna</span>
                             </div>
                         </div>
                         {/* Social */}
@@ -114,7 +114,7 @@ const Footer: React.FC = () => {
             {/* Bottom bar */}
             <div className="bg-black/20 border-t border-white/5 mt-0">
                 <div className="max-w-[1400px] mx-auto px-5 md:px-10 flex flex-col md:flex-row items-center justify-between py-4 gap-2.5">
-                    <p className="text-white/30 text-[0.8rem]">© 2026 AR Surgical Hub. All rights reserved.</p>
+                    <p className="text-white/30 text-[0.8rem]">© 2026 AR SURGICAL HUB. All rights reserved.</p>
                     <div className="flex gap-5">
                         {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((item) => (
                             <Link key={item} to="/" className="text-white/30 text-[0.8rem] transition-colors duration-200 hover:text-white/70">

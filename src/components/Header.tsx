@@ -40,8 +40,8 @@ const Header: React.FC = () => {
                 <div className="max-w-[1400px] mx-auto px-5 md:px-10">
                     <div className="hidden md:flex justify-between items-center py-2 border-b border-white/10 text-[0.82rem] text-white/80">
                         <div className="flex gap-5.5">
-                            <span className="flex items-center gap-1.25 text-white/90 font-primary"><Phone size={14} className="text-brand-blue" /> +1 (555) 123-4567</span>
-                            <span className="flex items-center gap-1.25 text-white/90 font-primary"><Mail size={14} className="text-brand-blue" /> support@arsurgical.com</span>
+                            <span className="flex items-center gap-1.25 text-white/90 font-primary"><Phone size={14} className="text-brand-blue" /> +94 77 0700 737</span>
+                            <span className="flex items-center gap-1.25 text-white/90 font-primary"><Mail size={14} className="text-brand-blue" /> support@arsurgicalhub.com</span>
                         </div>
                         <div className="flex items-center gap-3">
                             {user ? (
@@ -64,10 +64,10 @@ const Header: React.FC = () => {
                 <div className="max-w-[1400px] mx-auto px-5 md:px-10">
                     <nav className="flex justify-between items-center py-3.5">
                         <Link to="/" className="font-header font-800 flex items-center gap-2.5 text-brand-green-dark no-underline shadow-none transition-transform hover:scale-102">
-                            <img src="/ar.svg" alt="AR Surgical Hub" className="h-[42px] w-auto object-contain shrink-0" />
+                            <img src="/ar.svg" alt="AR SURGICAL HUB" className="h-[42px] w-auto object-contain shrink-0" />
                             <div className="flex flex-col leading-none">
                                 <span className="hidden sm:inline text-[1.1rem] font-800 text-brand-green-dark tracking-tighter">AR SURGICAL</span>
-                                <span className="hidden sm:inline text-[0.65rem] font-700 text-brand-green uppercase tracking-widest mt-0.5">Surgical Hub</span>
+                                <span className="hidden sm:inline text-[0.65rem] font-700 text-brand-green uppercase tracking-widest mt-0.5">SURGICAL HUB</span>
                             </div>
                         </Link>
 
