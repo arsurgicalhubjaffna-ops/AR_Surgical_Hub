@@ -107,3 +107,33 @@ export interface Setting {
     field_type: 'text' | 'textarea' | 'number' | 'boolean';
     updated_at: string;
 }
+
+export interface WarrantyClaim {
+    id: string;
+    user_id: string;
+    order_id: string;
+    product_id: string;
+    claim_type: 'defective' | 'damaged' | 'malfunction' | 'missing_parts' | 'other';
+    description: string;
+    status: 'submitted' | 'under_review' | 'approved' | 'rejected' | 'resolved';
+    priority: 'low' | 'medium' | 'high' | 'critical';
+    admin_notes?: string;
+    resolution?: string;
+    created_at: string;
+    updated_at: string;
+    users?: {
+        full_name: string;
+        email: string;
+        phone?: string;
+    };
+    orders?: {
+        id: string;
+        total_amount: number;
+        status: string;
+        created_at: string;
+    };
+    products?: {
+        name: string;
+        image_url: string;
+    };
+}

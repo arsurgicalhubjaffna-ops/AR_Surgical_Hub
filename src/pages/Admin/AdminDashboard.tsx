@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import insforge from '../../lib/insforge';
-import { ShoppingBag, Users, Package, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { ShoppingBag, Users, Package, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight, ShieldCheck } from 'lucide-react';
 
 const AdminDashboard: React.FC = () => {
     const [stats, setStats] = useState<any>(null);
@@ -10,10 +10,11 @@ const AdminDashboard: React.FC = () => {
     useEffect(() => {
         const loadStats = async () => {
             try {
-                const [productsRes, usersRes, ordersRes] = await Promise.all([
+                const [productsRes, usersRes, ordersRes, warrantyRes] = await Promise.all([
                     insforge.database.from('products').select('id', { count: 'exact', head: true }),
                     insforge.database.from('users').select('id', { count: 'exact', head: true }),
                     insforge.database.from('orders').select('id, total_amount, payment_status'),
+                    insforge.database.from('warranty_claims').select('id', { count: 'exact', head: true }),
                 ]);
 
                 const totalOrders = ordersRes.data?.length || 0;
@@ -26,6 +27,7 @@ const AdminDashboard: React.FC = () => {
                     users: usersRes.count || 0,
                     orders: totalOrders,
                     revenue: revenue,
+                    warranty: warrantyRes.count || 0,
                 });
 
                 const { data: recentOrders } = await insforge.database
@@ -86,6 +88,7 @@ const AdminDashboard: React.FC = () => {
                 <StatCard title="Total Users" value={stats?.users} icon={Users} color="bg-brand-green" trend={8} />
                 <StatCard title="Total Orders" value={stats?.orders} icon={ShoppingBag} color="bg-purple-500" trend={-2} />
                 <StatCard title="Revenue" value={stats?.revenue} icon={DollarSign} color="bg-amber-500" trend={24} />
+                <StatCard title="Warranty Claims" value={stats?.warranty} icon={ShieldCheck} color="bg-rose-500" />
             </div>
 
             {/* Recent Orders Table */}

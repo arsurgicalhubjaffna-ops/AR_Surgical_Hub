@@ -49,6 +49,7 @@ const Header: React.FC = () => {
                             {user ? (
                                 <div className="flex items-center gap-4">
                                     <Link to="/my-orders" className="text-white/90 hover:text-white transition-colors">My Orders</Link>
+                                    <Link to="/my-warranty" className="text-white/90 hover:text-white transition-colors">Warranty</Link>
                                     <div className="flex items-center gap-2.5">
                                         <span>Welcome, {user.full_name}</span>
                                         <button onClick={logout} className="bg-transparent border border-white/30 text-white px-3.5 py-1.25 rounded-md cursor-pointer text-[0.8rem] font-600 transition-all duration-200 hover:bg-white hover:text-brand-green">Logout</button>
@@ -147,6 +148,9 @@ const Header: React.FC = () => {
                     ))}
                     {user && (
                         <Link to="/my-orders" onClick={closeMenu} className="text-[1.rem] font-700 w-full py-4.5 border-b border-black/5 text-brand-text no-underline transition-colors duration-200 hover:text-brand-green">My Orders</Link>
+                    )}
+                    {user && (
+                        <Link to="/my-warranty" onClick={closeMenu} className="text-[1.rem] font-700 w-full py-4.5 border-b border-black/5 text-brand-text no-underline transition-colors duration-200 hover:text-brand-green">Warranty Claims</Link>
                     )}
                     {user?.role === 'admin' && (
                         <Link to="/admin" onClick={closeMenu} className="text-[1.rem] font-800 w-full py-4.5 border-b border-black/5 text-brand-green no-underline transition-colors duration-200">Admin Dashboard</Link>

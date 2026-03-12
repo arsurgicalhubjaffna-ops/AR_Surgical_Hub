@@ -15,6 +15,9 @@ import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
 import MyOrders from './pages/MyOrders';
 import OrderDetail from './pages/OrderDetail';
+import MyWarranty from './pages/MyWarranty';
+import WarrantyClaimForm from './pages/WarrantyClaimForm';
+import WarrantyDetail from './pages/WarrantyDetail';
 import AdminPanel from './pages/Admin/AdminPanel';
 import AdminRoute from './pages/Admin/AdminRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -61,6 +64,9 @@ function App() {
                     <Route path="/blog/:id" element={<BlogDetail />} />
                     <Route path="/my-orders" element={<MyOrders />} />
                     <Route path="/order/:id" element={<OrderDetail />} />
+                    <Route path="/my-warranty" element={<MyWarranty />} />
+                    <Route path="/warranty/new" element={<WarrantyClaimForm />} />
+                    <Route path="/warranty/:id" element={<WarrantyDetail />} />
                     <Route path="/careers" element={<Careers />} />
                     <Route path="/login" element={<Login />} />
                   </Routes>
