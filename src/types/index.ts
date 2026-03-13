@@ -152,3 +152,16 @@ export interface Vacancy {
     created_at: string;
     updated_at?: string;
 }
+
+export interface JobApplication {
+    id: string;
+    vacancy_id: string;
+    full_name: string;
+    email: string;
+    phone?: string;
+    resume_url?: string;
+    cover_letter?: string;
+    status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected';
+    created_at: string;
+    updated_at: string;
+}
