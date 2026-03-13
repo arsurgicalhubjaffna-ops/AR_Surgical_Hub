@@ -123,7 +123,7 @@ const AdminPanel: React.FC = () => {
                         </div>
                         {sidebarOpen && (
                             <div className="ml-4 overflow-hidden whitespace-nowrap animate-in fade-in slide-in-from-left-2 duration-300">
-                                <h2 className="text-lg font-900 tracking-tighter text-white leading-tight">AR SURGICAL</h2>
+                                <h2 className="text-lg font-900 tracking-tighter text-white leading-tight">AR</h2>
                                 <span className="text-[0.6rem] font-800 uppercase tracking-[0.2em] text-brand-green/80">SURGICAL HUB</span>
                             </div>
                         )}

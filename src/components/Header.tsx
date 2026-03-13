@@ -69,7 +69,7 @@ const Header: React.FC = () => {
                         <Link to="/" className="font-header font-800 flex items-center gap-2.5 text-brand-green-dark no-underline shadow-none transition-transform hover:scale-102">
                             <img src="/ar.svg" alt="AR SURGICAL HUB" className="h-[42px] w-auto object-contain shrink-0" />
                             <div className="flex flex-col leading-none">
-                                <span className="hidden sm:inline text-[1.1rem] font-800 text-brand-green-dark tracking-tighter">AR SURGICAL</span>
+                                <span className="hidden sm:inline text-[1.1rem] font-800 text-brand-green-dark tracking-tighter">AR</span>
                                 <span className="hidden sm:inline text-[0.65rem] font-700 text-brand-green uppercase tracking-widest mt-0.5">SURGICAL HUB</span>
                             </div>
                         </Link>

@@ -15,7 +15,7 @@ const Footer: React.FC = () => {
                         <Link to="/" className="flex items-center gap-2.5 mb-6 no-underline transition-opacity hover:opacity-80">
                             <img src="/ar.svg" alt="AR SURGICAL HUB" className="h-[38px] brightness-0 invert opacity-90" />
                             <div className="flex flex-col leading-none">
-                                <span className="font-header text-[1.1rem] font-800 text-white tracking-tighter">AR SURGICAL</span>
+                                <span className="font-header text-[1.1rem] font-800 text-white tracking-tighter">AR</span>
                                 <span className="text-[0.65rem] font-700 text-brand-blue uppercase tracking-widest mt-0.5">SURGICAL HUB</span>
                             </div>
                         </Link>
