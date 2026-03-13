@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { 
     Plus, Pencil, Trash2, X, Search, CheckCircle2, Briefcase, MapPin, 
     DollarSign, Clock, ToggleLeft, ToggleRight, AlertTriangle, 
-    Filter, ChevronDown, Layers, Target, BookOpen
+    Filter, ChevronDown, Layers, Target, BookOpen, User, Mail, Phone, FileText, ExternalLink, Loader2
 } from 'lucide-react';
-import { Vacancy } from '../../types';
-import { loadVacancies, saveVacancy, deleteVacancy, toggleVacancyStatus } from './AdminCareersHandler';
+import { Vacancy, JobApplication } from '../../types';
+import { loadVacancies, saveVacancy, deleteVacancy, toggleVacancyStatus, loadApplications, updateApplicationStatus } from './AdminCareersHandler';
 
 const emptyForm: Omit<Vacancy, 'id' | 'created_at' | 'updated_at'> = {
     position: '',
@@ -22,20 +22,30 @@ const emptyForm: Omit<Vacancy, 'id' | 'created_at' | 'updated_at'> = {
 const JOB_TYPES = ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Freelance'];
 const DEPARTMENTS = ['General', 'Surgical', 'Technical', 'Sales', 'Customer Support', 'Warehouse', 'Management'];
 const EXPERIENCE_LEVELS = ['Junior', 'Intermediate', 'Senior', 'Expert', 'Lead'];
+const APP_STATUSES = ['pending', 'reviewed', 'shortlisted', 'rejected'] as const;
 
 const AdminCareers: React.FC = () => {
+    const [activeTab, setActiveTab] = useState<'vacancies' | 'applications'>('vacancies');
     const [vacancies, setVacancies] = useState<Vacancy[]>([]);
+    const [applications, setApplications] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [modal, setModal] = useState(false);
     const [form, setForm] = useState(emptyForm);
     const [editId, setEditId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'closed'>('all');
+    const [filterStatus, setFilterStatus] = useState<string>('all');
+    const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
     const load = async () => {
+        setLoading(true);
         try {
-            const data = await loadVacancies();
-            setVacancies(data);
+            if (activeTab === 'vacancies') {
+                const data = await loadVacancies();
+                setVacancies(data);
+            } else {
+                const data = await loadApplications();
+                setApplications(data);
+            }
         } catch (err) {
             console.error('Career Load Error:', err);
         } finally {
@@ -43,7 +53,7 @@ const AdminCareers: React.FC = () => {
         }
     };
 
-    useEffect(() => { load(); }, []);
+    useEffect(() => { load(); }, [activeTab]);
 
     const openAdd = () => { setForm(emptyForm); setEditId(null); setModal(true); };
     const openEdit = (v: Vacancy) => {
@@ -91,6 +101,18 @@ const AdminCareers: React.FC = () => {
         }
     };
 
+    const handleUpdateAppStatus = async (id: string, status: string) => {
+        setUpdatingStatus(id);
+        try {
+            await updateApplicationStatus(id, status);
+            load();
+        } catch (err) {
+            alert('Failed to update application status');
+        } finally {
+            setUpdatingStatus(null);
+        }
+    };
+
     const filteredVacancies = vacancies.filter(v => {
         const matchesSearch = v.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
                              v.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -103,13 +125,23 @@ const AdminCareers: React.FC = () => {
         return matchesSearch && matchesStatus;
     });
 
-    const stats = {
-        total: vacancies.length,
-        active: vacancies.filter(v => v.is_active).length,
-        closed: vacancies.filter(v => !v.is_active).length
-    };
+    const filteredApplications = applications.filter(app => {
+        const matchesSearch = app.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             app.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             app.vacancies?.position.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesStatus = filterStatus === 'all' || app.status === filterStatus;
+        
+        return matchesSearch && matchesStatus;
+    });
 
-    if (loading) return <div className="text-secondary italic animate-pulse">Syncing careers...</div>;
+    const stats = {
+        totalVacancies: vacancies.length,
+        activeVacancies: vacancies.filter(v => v.is_active).length,
+        closedVacancies: vacancies.filter(v => !v.is_active).length,
+        totalApps: applications.length,
+        pendingApps: applications.filter(a => a.status === 'pending').length
+    };
 
     return (
         <div className="flex flex-col gap-6">
@@ -123,136 +155,266 @@ const AdminCareers: React.FC = () => {
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-black/5 shadow-sm">
                             <Briefcase size={18} className="text-brand-green" />
-                            <span className="text-sm font-800 text-brand-text">{stats.total} Total</span>
+                            <span className="text-sm font-800 text-brand-text">{stats.totalVacancies} Vacancies</span>
                         </div>
                         <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-black/5 shadow-sm">
-                            <CheckCircle2 size={18} className="text-brand-green" />
-                            <span className="text-sm font-800 text-brand-green">{stats.active} Active</span>
+                            <FileText size={18} className="text-brand-green" />
+                            <span className="text-sm font-800 text-brand-green">{stats.totalApps} Applications</span>
                         </div>
                     </div>
+                </div>
+
+                {/* Sub Tabs */}
+                <div className="px-8 border-b border-black/5 bg-white flex gap-8">
+                    <button 
+                        onClick={() => { setActiveTab('vacancies'); setFilterStatus('all'); setSearchTerm(''); }}
+                        className={`py-4 text-xs font-800 uppercase tracking-[0.2em] relative transition-all ${activeTab === 'vacancies' ? 'text-brand-green' : 'text-gray-400 hover:text-brand-text'}`}
+                    >
+                        Vacancies
+                        {activeTab === 'vacancies' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-green rounded-t-full shadow-[0_-2px_10px_rgba(56,189,248,0.4)]" />}
+                    </button>
+                    <button 
+                        onClick={() => { setActiveTab('applications'); setFilterStatus('all'); setSearchTerm(''); }}
+                        className={`py-4 text-xs font-800 uppercase tracking-[0.2em] relative transition-all ${activeTab === 'applications' ? 'text-brand-green' : 'text-gray-400 hover:text-brand-text'}`}
+                    >
+                        Applications
+                        {activeTab === 'applications' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-green rounded-t-full shadow-[0_-2px_10px_rgba(56,189,248,0.4)]" />}
+                        {stats.pendingApps > 0 && (
+                            <span className="absolute -top-1 -right-4 w-4 h-4 bg-brand-red text-white text-[10px] flex items-center justify-center rounded-full font-bold">
+                                {stats.pendingApps}
+                            </span>
+                        )}
+                    </button>
                 </div>
 
                 {/* Filter Tabs + Search */}
                 <div className="px-8 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-black/5 bg-white">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                        {(['all', 'active', 'closed'] as const).map(tab => (
-                            <button
-                                key={tab}
-                                onClick={() => setFilterStatus(tab)}
-                                className={`px-4 py-2 rounded-lg text-xs font-800 uppercase tracking-widest transition-all ${filterStatus === tab
-                                    ? 'bg-brand-green text-white shadow-sm'
-                                    : 'text-gray-400 hover:bg-brand-bg hover:text-brand-text'
-                                    }`}
-                            >
-                                {tab} ({tab === 'all' ? stats.total : tab === 'active' ? stats.active : stats.closed})
-                            </button>
-                        ))}
+                        {activeTab === 'vacancies' ? (
+                            (['all', 'active', 'closed'] as const).map(tab => (
+                                <button
+                                    key={tab}
+                                    onClick={() => setFilterStatus(tab)}
+                                    className={`px-4 py-2 rounded-lg text-xs font-800 uppercase tracking-widest transition-all ${filterStatus === tab
+                                        ? 'bg-brand-green text-white shadow-sm'
+                                        : 'text-gray-400 hover:bg-brand-bg hover:text-brand-text'
+                                        }`}
+                                >
+                                    {tab} ({tab === 'all' ? stats.totalVacancies : tab === 'active' ? stats.activeVacancies : stats.closedVacancies})
+                                </button>
+                            ))
+                        ) : (
+                            (['all', ...APP_STATUSES] as const).map(status => (
+                                <button
+                                    key={status}
+                                    onClick={() => setFilterStatus(status)}
+                                    className={`px-4 py-2 rounded-lg text-xs font-800 uppercase tracking-widest transition-all ${filterStatus === status
+                                        ? 'bg-brand-green text-white shadow-sm'
+                                        : 'text-gray-400 hover:bg-brand-bg hover:text-brand-text'
+                                        }`}
+                                >
+                                    {status} ({status === 'all' ? stats.totalApps : applications.filter(a => a.status === status).length})
+                                </button>
+                            ))
+                        )}
                     </div>
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
                         <div className="flex items-center gap-2 bg-brand-bg px-4 py-2 rounded-xl border border-black/5 w-full sm:w-64">
                             <Search size={16} className="text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search vacancies..."
+                                placeholder={`Search ${activeTab}...`}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="bg-transparent border-none outline-none text-sm font-500 w-full"
                             />
                         </div>
-                        <button
-                            onClick={openAdd}
-                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-brand-green text-white px-5 py-2.5 rounded-xl font-800 text-sm transition-all hover:bg-brand-green-dark shadow-lg shadow-brand-green/20"
-                        >
-                            <Plus size={18} /> New Vacancy
-                        </button>
+                        {activeTab === 'vacancies' && (
+                            <button
+                                onClick={openAdd}
+                                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-brand-green text-white px-5 py-2.5 rounded-xl font-800 text-sm transition-all hover:bg-brand-green-dark shadow-lg shadow-brand-green/20"
+                            >
+                                <Plus size={18} /> New Vacancy
+                            </button>
+                        )}
                     </div>
                 </div>
 
-                {/* Table */}
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="bg-brand-bg/50 border-b border-black/5">
-                                <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest min-w-[300px]">Position & Dept</th>
-                                <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Type / Level</th>
-                                <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Location</th>
-                                <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Status</th>
-                                <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Date</th>
-                                <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-black/5">
-                            {filteredVacancies.map(v => (
-                                <tr key={v.id} className="hover:bg-brand-bg/30 transition-colors group">
-                                    <td className="px-8 py-5">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 bg-brand-bg rounded-lg border border-black/5 flex items-center justify-center shrink-0">
-                                                <Briefcase size={20} className="text-brand-green" />
-                                            </div>
-                                            <div>
-                                                <h3 className="font-800 text-brand-text text-sm hover:text-brand-green transition-colors line-clamp-1">{v.position}</h3>
-                                                <span className="inline-block mt-1 text-[0.65rem] font-700 text-gray-400 uppercase tracking-wider">
-                                                    {v.department || 'General'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-5">
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-xs font-700 text-brand-text">{v.type || 'Full-Time'}</span>
-                                            <span className="text-[0.65rem] font-600 text-gray-400 uppercase tracking-wider">{v.experience_level || 'Intermediate'}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-5">
-                                        <div className="flex items-center gap-1.5 text-sm text-secondary font-500">
-                                            <MapPin size={14} className="text-brand-green" /> {v.location || 'Remote'}
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-5">
-                                        <button
-                                            onClick={() => handleToggleStatus(v)}
-                                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.75rem] font-800 tracking-tight transition-colors ${v.is_active ? 'bg-brand-green/10 text-brand-green hover:bg-brand-green/20' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
-                                        >
-                                            {v.is_active ? (
-                                                <><CheckCircle2 size={12} /> Active</>
-                                            ) : (
-                                                <><X size={12} /> Closed</>
-                                            )}
-                                        </button>
-                                    </td>
-                                    <td className="px-8 py-5">
-                                        <div className="flex items-center gap-1.5 text-sm text-gray-400 font-500">
-                                            <Clock size={14} /> {new Date(v.created_at).toLocaleDateString()}
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-5 text-right">
-                                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button
-                                                onClick={() => openEdit(v)}
-                                                className="p-2 text-gray-400 hover:text-brand-green hover:bg-brand-green/5 rounded-lg transition-all"
-                                            >
-                                                <Pencil size={16} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(v.id)}
-                                                className="p-2 text-gray-400 hover:text-brand-red hover:bg-brand-red/5 rounded-lg transition-all"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </td>
+                {/* Table Content */}
+                {loading ? (
+                    <div className="p-20 text-center animate-pulse text-gray-400 font-600 italic">Syncing {activeTab}...</div>
+                ) : activeTab === 'vacancies' ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="bg-brand-bg/50 border-b border-black/5">
+                                    <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest min-w-[300px]">Position & Dept</th>
+                                    <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Type / Level</th>
+                                    <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Location</th>
+                                    <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Status</th>
+                                    <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Date</th>
+                                    <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest text-right">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                {filteredVacancies.length === 0 && (
+                            </thead>
+                            <tbody className="divide-y divide-black/5">
+                                {filteredVacancies.map(v => (
+                                    <tr key={v.id} className="hover:bg-brand-bg/30 transition-colors group">
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-brand-bg rounded-lg border border-black/5 flex items-center justify-center shrink-0">
+                                                    <Briefcase size={20} className="text-brand-green" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-800 text-brand-text text-sm hover:text-brand-green transition-colors line-clamp-1">{v.position}</h3>
+                                                    <span className="inline-block mt-1 text-[0.65rem] font-700 text-gray-400 uppercase tracking-wider">
+                                                        {v.department || 'General'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-xs font-700 text-brand-text">{v.type || 'Full-Time'}</span>
+                                                <span className="text-[0.65rem] font-600 text-gray-400 uppercase tracking-wider">{v.experience_level || 'Intermediate'}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-1.5 text-sm text-secondary font-500">
+                                                <MapPin size={14} className="text-brand-green" /> {v.location || 'Remote'}
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <button
+                                                onClick={() => handleToggleStatus(v)}
+                                                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.75rem] font-800 tracking-tight transition-colors ${v.is_active ? 'bg-brand-green/10 text-brand-green hover:bg-brand-green/20' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                                            >
+                                                {v.is_active ? (
+                                                    <><CheckCircle2 size={12} /> Active</>
+                                                ) : (
+                                                    <><X size={12} /> Closed</>
+                                                )}
+                                            </button>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-1.5 text-sm text-gray-400 font-500">
+                                                <Clock size={14} /> {new Date(v.created_at).toLocaleDateString()}
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5 text-right">
+                                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    onClick={() => openEdit(v)}
+                                                    className="p-2 text-gray-400 hover:text-brand-green hover:bg-brand-green/5 rounded-lg transition-all"
+                                                >
+                                                    <Pencil size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(v.id)}
+                                                    className="p-2 text-gray-400 hover:text-brand-red hover:bg-brand-red/5 rounded-lg transition-all"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="bg-brand-bg/50 border-b border-black/5">
+                                    <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest min-w-[250px]">Applicant Info</th>
+                                    <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Applying For</th>
+                                    <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Resume / CV</th>
+                                    <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Status</th>
+                                    <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Date</th>
+                                    <th className="px-8 py-5 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest text-right">Update Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-black/5">
+                                {filteredApplications.map(app => (
+                                    <tr key={app.id} className="hover:bg-brand-bg/30 transition-colors group">
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-brand-bg rounded-full flex items-center justify-center text-brand-green font-900 border border-brand-green/20">
+                                                    {app.full_name[0]}
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-800 text-brand-text text-sm">{app.full_name}</h3>
+                                                    <div className="flex flex-col gap-0.5 mt-1">
+                                                        <span className="flex items-center gap-1 text-[0.65rem] font-600 text-gray-400"><Mail size={10} /> {app.email}</span>
+                                                        {app.phone && <span className="flex items-center gap-1 text-[0.65rem] font-600 text-gray-400"><Phone size={10} /> {app.phone}</span>}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <span className="text-xs font-700 text-brand-text flex items-center gap-2">
+                                                <Target size={14} className="text-brand-green" />
+                                                {app.vacancies?.position || 'Unknown Role'}
+                                            </span>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            {app.resume_url ? (
+                                                <a 
+                                                    href={app.resume_url} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-bg border border-black/5 text-[0.7rem] font-800 text-secondary hover:text-brand-green hover:border-brand-green/30 transition-all"
+                                                >
+                                                    <FileText size={14} /> Open PDF <ExternalLink size={12} />
+                                                </a>
+                                            ) : (
+                                                <span className="text-[0.7rem] font-600 text-gray-300 italic">No resume</span>
+                                            )}
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <span className={`inline-block px-2.5 py-1 rounded-full text-[0.65rem] font-800 uppercase tracking-widest
+                                                ${app.status === 'pending' ? 'bg-amber-100 text-amber-700' : 
+                                                  app.status === 'reviewed' ? 'bg-blue-100 text-blue-700' :
+                                                  app.status === 'shortlisted' ? 'bg-brand-green/10 text-brand-green' :
+                                                  'bg-red-100 text-red-700'}`}
+                                            >
+                                                {app.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-8 py-5 text-[0.7rem] font-600 text-gray-400 whitespace-nowrap">
+                                            {new Date(app.created_at).toLocaleDateString()}
+                                        </td>
+                                        <td className="px-8 py-5 text-right">
+                                            <div className="relative inline-block group/status">
+                                                <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-black/5 text-[0.7rem] font-800 text-brand-text">
+                                                    {updatingStatus === app.id ? <Loader2 size={12} className="animate-spin" /> : <ChevronDown size={14} />}
+                                                </button>
+                                                <div className="absolute right-0 top-full mt-2 w-32 bg-white border border-black/5 rounded-xl shadow-xl opacity-0 invisible group-hover/status:opacity-100 group-hover/status:visible transition-all z-20 overflow-hidden">
+                                                    {APP_STATUSES.map(status => (
+                                                        <button
+                                                            key={status}
+                                                            onClick={() => handleUpdateAppStatus(app.id, status)}
+                                                            className="w-full text-left px-4 py-2 text-[0.65rem] font-800 uppercase tracking-widest text-secondary hover:bg-brand-bg hover:text-brand-green transition-colors"
+                                                        >
+                                                            {status}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                {((activeTab === 'vacancies' && filteredVacancies.length === 0) || (activeTab === 'applications' && filteredApplications.length === 0)) && (
                     <div className="p-20 text-center">
                         <div className="w-16 h-16 bg-brand-bg rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
-                            <Briefcase size={32} />
+                            {activeTab === 'vacancies' ? <Briefcase size={32} /> : <FileText size={32} />}
                         </div>
-                        <p className="text-secondary font-600">No vacancies found.</p>
-                        <p className="text-[0.85rem] text-gray-400 mt-2">Try adjusting your filters or create a new vacancy.</p>
+                        <p className="text-secondary font-600">No {activeTab} found.</p>
                     </div>
                 )}
             </div>
@@ -282,7 +444,7 @@ const AdminCareers: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="p-8 flex-1 overflow-y-auto flex flex-col gap-6">
+                        <div className="p-8 flex-1 overflow-y-auto flex flex-col gap-6 no-scrollbar">
                             {/* Row 1: Position & Dept */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
