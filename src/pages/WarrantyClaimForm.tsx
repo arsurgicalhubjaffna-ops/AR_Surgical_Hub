@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, ShieldCheck, Package, ChevronRight, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Package, ChevronRight, CheckCircle2, AlertTriangle, Store, ShoppingBag, Search, Upload, X } from 'lucide-react';
 import insforge from '../lib/insforge';
-import { Order, OrderItem } from '../types';
+import { Order, OrderItem, Product } from '../types';
 import { useAuth } from '../context/AuthContext';
 import ProductImage from '../components/ProductImage';
 
@@ -17,43 +17,62 @@ const CLAIM_TYPES = [
 const WarrantyClaimForm: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(0); // 0: Select Purchase Type
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     // Data
     const [orders, setOrders] = useState<Order[]>([]);
     const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+    const [allProducts, setAllProducts] = useState<Product[]>([]);
     const [loadingItems, setLoadingItems] = useState(false);
+    const [loadingProducts, setLoadingProducts] = useState(false);
 
     // Form state
+    const [purchaseType, setPurchaseType] = useState<'online' | 'instore'>('online');
     const [selectedOrderId, setSelectedOrderId] = useState('');
     const [selectedProductId, setSelectedProductId] = useState('');
     const [selectedProductName, setSelectedProductName] = useState('');
+    const [receiptNumber, setReceiptNumber] = useState('');
+    const [receiptUrl, setReceiptUrl] = useState('');
     const [claimType, setClaimType] = useState('');
     const [description, setDescription] = useState('');
+    const [productSearch, setProductSearch] = useState('');
 
-    // Fetch delivered orders
+    // Fetch data
     useEffect(() => {
-        const fetchOrders = async () => {
+        const fetchData = async () => {
             if (!user) return;
             try {
-                const { data, error } = await insforge.database
+                // Fetch delivered orders
+                const { data: ordersData, error: ordersError } = await insforge.database
                     .from('orders')
                     .select('*')
                     .eq('user_id', user.id)
                     .eq('status', 'delivered')
                     .order('created_at', { ascending: false });
 
-                if (error) throw error;
-                setOrders((data || []) as Order[]);
+                if (ordersError) throw ordersError;
+                setOrders((ordersData || []) as Order[]);
+
+                // Fetch all active products (for in-store selection)
+                const { data: productsData, error: productsError } = await insforge.database
+                    .from('products')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('name');
+
+                if (productsError) throw productsError;
+                setAllProducts((productsData || []) as Product[]);
+
             } catch (err) {
-                console.error('Error fetching orders:', err);
+                console.error('Error fetching data:', err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchOrders();
+        fetchData();
     }, [user]);
 
     // Fetch items for selected order
@@ -82,15 +101,69 @@ const WarrantyClaimForm: React.FC = () => {
         setStep(2);
     };
 
+    const handlePurchaseTypeSelect = (type: 'online' | 'instore') => {
+        setPurchaseType(type);
+        setStep(1);
+    };
+
     const handleProductSelect = (productId: string, productName: string) => {
         setSelectedProductId(productId);
         setSelectedProductName(productName);
-        setStep(3);
+        if (purchaseType === 'instore') {
+            setStep(4); // Skip claim type selection for a moment to get receipt info first? 
+            // Actually let's follow the plan: 
+            // Online: Order -> Product -> Claim Type -> Description -> Submit
+            // InStore: Product -> Receipt -> Claim Type -> Description -> Submit
+            setStep(2.5); // New step for receipt info
+        } else {
+            setStep(3);
+        }
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !user) return;
+
+        setUploading(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+            const filePath = `receipts/${fileName}`;
+
+            const { error: uploadError } = await insforge.storage
+                .from('warranty_proofs')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const response = insforge.storage
+                .from('warranty_proofs')
+                .getPublicUrl(filePath);
+
+            const publicUrl = typeof response === 'string' ? response : (response as any).data.publicUrl;
+
+            setReceiptUrl(publicUrl);
+        } catch (err) {
+            console.error('Upload error:', err);
+            alert('Failed to upload receipt image');
+        } finally {
+            setUploading(false);
+        }
     };
 
     const handleSubmit = async () => {
-        if (!user || !selectedOrderId || !selectedProductId || !claimType || !description.trim()) {
+        if (!user || !selectedProductId || !claimType || !description.trim()) {
             alert('Please fill in all required fields');
+            return;
+        }
+
+        if (purchaseType === 'online' && !selectedOrderId) {
+            alert('Please select an order');
+            return;
+        }
+
+        if (purchaseType === 'instore' && !receiptNumber) {
+            alert('Please provide a receipt number');
             return;
         }
 
@@ -100,8 +173,11 @@ const WarrantyClaimForm: React.FC = () => {
                 .from('warranty_claims')
                 .insert([{
                     user_id: user.id,
-                    order_id: selectedOrderId,
+                    purchase_type: purchaseType,
+                    order_id: purchaseType === 'online' ? selectedOrderId : null,
                     product_id: selectedProductId,
+                    receipt_number: purchaseType === 'instore' ? receiptNumber : null,
+                    receipt_url: purchaseType === 'instore' ? receiptUrl : null,
                     claim_type: claimType,
                     description: description.trim(),
                     status: 'submitted',
@@ -117,6 +193,11 @@ const WarrantyClaimForm: React.FC = () => {
             setSubmitting(false);
         }
     };
+
+    const filteredProducts = allProducts.filter(p =>
+        p.name.toLowerCase().includes(productSearch.toLowerCase())
+    );
+
 
     if (loading) {
         return (
@@ -147,30 +228,64 @@ const WarrantyClaimForm: React.FC = () => {
                         <div className="absolute top-5 left-[30px] right-[30px] h-1 bg-gray-100 z-0">
                             <div
                                 className="h-full bg-brand-green transition-all duration-500 ease-out"
-                                style={{ width: `${((step - 1) / 3) * 100}%` }}
+                                style={{ width: `${(step / 4) * 100}%` }}
                             ></div>
                         </div>
                         {[
-                            { label: 'Select Order', num: 1 },
-                            { label: 'Select Product', num: 2 },
-                            { label: 'Claim Type', num: 3 },
+                            { label: 'Type', num: 0 },
+                            { label: 'Select', num: 1 },
+                            { label: 'Product', num: 2 },
+                            { label: 'Info', num: 2.5 },
+                            { label: 'Issue', num: 3 },
                             { label: 'Submit', num: 4 },
                         ].map(s => {
                             const active = step >= s.num;
+                            // Hide 2.5 for online and 2 for instore visually
+                            if (purchaseType === 'online' && s.num === 2.5) return null;
+                            if (purchaseType === 'instore' && s.num === 2) return null;
+
                             return (
                                 <div key={s.num} className="relative z-10 flex flex-col items-center gap-2">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-800 transition-colors duration-300 ${active ? 'bg-brand-green text-white' : 'bg-white border-2 border-gray-100 text-gray-300'}`}>
-                                        {s.num}
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-800 transition-colors duration-300 ${active ? 'bg-brand-green text-white' : 'bg-white border-2 border-gray-100 text-gray-300'}`}>
+                                        {Number.isInteger(s.num) ? s.num + 1 : ''}
+                                        {!Number.isInteger(s.num) && <CheckCircle2 size={16} />}
                                     </div>
-                                    <span className={`text-[0.65rem] font-700 uppercase tracking-widest ${active ? 'text-brand-text' : 'text-gray-300'}`}>{s.label}</span>
+                                    <span className={`text-[0.6rem] font-700 uppercase tracking-widest ${active ? 'text-brand-text' : 'text-gray-300'}`}>{s.label}</span>
                                 </div>
                             );
                         })}
                     </div>
                 </div>
 
-                {/* Step 1: Select Order */}
-                {step === 1 && (
+                {/* Step 0: Select Purchase Type */}
+                {step === 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button
+                            onClick={() => handlePurchaseTypeSelect('online')}
+                            className="bg-white rounded-[28px] border border-black/5 p-8 shadow-sm hover:shadow-md hover:border-brand-green/30 transition-all text-center group"
+                        >
+                            <div className="w-16 h-16 bg-brand-bg rounded-2xl flex items-center justify-center text-brand-green mx-auto mb-6 group-hover:scale-110 transition-transform">
+                                <ShoppingBag size={32} />
+                            </div>
+                            <h3 className="text-xl font-900 text-brand-text mb-2">Online Purchase</h3>
+                            <p className="text-sm text-gray-400 font-500">I bought this product through the online store.</p>
+                        </button>
+
+                        <button
+                            onClick={() => handlePurchaseTypeSelect('instore')}
+                            className="bg-white rounded-[28px] border border-black/5 p-8 shadow-sm hover:shadow-md hover:border-brand-green/30 transition-all text-center group"
+                        >
+                            <div className="w-16 h-16 bg-brand-bg rounded-2xl flex items-center justify-center text-brand-green mx-auto mb-6 group-hover:scale-110 transition-transform">
+                                <Store size={32} />
+                            </div>
+                            <h3 className="text-xl font-900 text-brand-text mb-2">In-Store Purchase</h3>
+                            <p className="text-sm text-gray-400 font-500">I bought this product directly at our physical store.</p>
+                        </button>
+                    </div>
+                )}
+
+                {/* Step 1: Select Order (Online Only) */}
+                {step === 1 && purchaseType === 'online' && (
                     <div className="bg-white rounded-[24px] border border-black/5 shadow-sm overflow-hidden">
                         <div className="px-6 py-5 bg-brand-bg/50 border-b border-black/5">
                             <h3 className="text-sm font-900 uppercase tracking-widest text-brand-text">Select Delivered Order</h3>
@@ -208,7 +323,58 @@ const WarrantyClaimForm: React.FC = () => {
                     </div>
                 )}
 
-                {/* Step 2: Select Product */}
+                {/* Step 1: Select Product (In-Store Only) */}
+                {step === 1 && purchaseType === 'instore' && (
+                    <div className="bg-white rounded-[24px] border border-black/5 shadow-sm overflow-hidden">
+                        <div className="px-6 py-5 bg-brand-bg/50 border-b border-black/5 flex items-center justify-between">
+                            <div>
+                                <h3 className="text-sm font-900 uppercase tracking-widest text-brand-text">Select Product</h3>
+                                <p className="text-xs text-secondary font-500 mt-1">Search and select the product you purchased in-store.</p>
+                            </div>
+                            <button onClick={() => setStep(0)} className="text-xs font-700 text-brand-green hover:underline">Change Type</button>
+                        </div>
+                        <div className="p-4 border-b border-black/5">
+                            <div className="relative flex items-center bg-brand-bg px-4 py-2 rounded-xl border border-black/5">
+                                <Search size={18} className="text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Search products..."
+                                    value={productSearch}
+                                    onChange={(e) => setProductSearch(e.target.value)}
+                                    className="bg-transparent border-none outline-none text-sm font-500 w-full ml-2"
+                                />
+                            </div>
+                        </div>
+                        <div className="max-h-[400px] overflow-y-auto divide-y divide-black/5">
+                            {filteredProducts.length > 0 ? (
+                                filteredProducts.map(product => (
+                                    <button
+                                        key={product.id}
+                                        onClick={() => handleProductSelect(product.id, product.name)}
+                                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-brand-bg/30 transition-colors group text-left"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-xl overflow-hidden border border-black/5 shrink-0">
+                                                <ProductImage src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+                                            </div>
+                                            <div>
+                                                <span className="text-sm font-800 text-brand-text">{product.name}</span>
+                                                <div className="text-xs text-gray-400 font-500 mt-0.5">
+                                                    {product.price.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ChevronRight size={18} className="text-gray-300 group-hover:text-brand-green transition-colors" />
+                                    </button>
+                                ))
+                            ) : (
+                                <div className="p-8 text-center text-gray-400 italic">No products found matching your search.</div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Step 2: Select Product (Online Only) */}
                 {step === 2 && (
                     <div className="bg-white rounded-[24px] border border-black/5 shadow-sm overflow-hidden">
                         <div className="px-6 py-5 bg-brand-bg/50 border-b border-black/5 flex items-center justify-between">
@@ -247,6 +413,71 @@ const WarrantyClaimForm: React.FC = () => {
                     </div>
                 )}
 
+                {/* Step 2.5: Receipt Info (In-Store Only) */}
+                {step === 2.5 && (
+                    <div className="bg-white rounded-[24px] border border-black/5 shadow-sm overflow-hidden">
+                        <div className="px-6 py-5 bg-brand-bg/50 border-b border-black/5 flex items-center justify-between">
+                            <div>
+                                <h3 className="text-sm font-900 uppercase tracking-widest text-brand-text">Receipt Information</h3>
+                                <p className="text-xs text-gray-400 font-500 mt-1">Proof of purchase for <strong>{selectedProductName}</strong></p>
+                            </div>
+                            <button onClick={() => setStep(1)} className="text-xs font-700 text-brand-green hover:underline">Change Product</button>
+                        </div>
+                        <div className="p-6 space-y-6">
+                            <div>
+                                <label className="block text-xs font-800 text-gray-400 uppercase tracking-widest mb-2">
+                                    Receipt / Invoice Number *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={receiptNumber}
+                                    onChange={(e) => setReceiptNumber(e.target.value)}
+                                    placeholder="e.g. INV-2024-001"
+                                    className="w-full px-4 py-3 rounded-xl border border-black/10 text-sm font-500 focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green/30 transition-all"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-800 text-gray-400 uppercase tracking-widest mb-2">
+                                    Upload Receipt Photo
+                                </label>
+                                {receiptUrl ? (
+                                    <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-black/5">
+                                        <img src={receiptUrl} alt="Receipt" className="w-full h-full object-cover" />
+                                        <button
+                                            onClick={() => setReceiptUrl('')}
+                                            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-black/10 rounded-2xl cursor-pointer hover:bg-brand-bg transition-colors group">
+                                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <div className="w-12 h-12 bg-brand-bg rounded-xl flex items-center justify-center text-gray-400 mb-3 group-hover:scale-110 transition-transform">
+                                                <Upload size={24} />
+                                            </div>
+                                            <p className="text-sm font-700 text-brand-text">
+                                                {uploading ? 'Uploading...' : 'Click to upload receipt photo'}
+                                            </p>
+                                            <p className="text-xs text-gray-400 mt-1">PNG, JPG or PDF up to 10MB</p>
+                                        </div>
+                                        <input type="file" className="hidden" accept="image/*,.pdf" onChange={handleFileUpload} disabled={uploading} />
+                                    </label>
+                                )}
+                            </div>
+
+                            <button
+                                onClick={() => setStep(3)}
+                                disabled={!receiptNumber}
+                                className="w-full px-6 py-4 rounded-xl text-sm font-800 bg-brand-green text-white hover:bg-brand-green-dark transition-colors shadow-lg shadow-brand-green/20 disabled:opacity-50"
+                            >
+                                Continue to Issue Details
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {/* Step 3: Claim Type */}
                 {step === 3 && (
                     <div className="bg-white rounded-[24px] border border-black/5 shadow-sm overflow-hidden">
@@ -255,7 +486,7 @@ const WarrantyClaimForm: React.FC = () => {
                                 <h3 className="text-sm font-900 uppercase tracking-widest text-brand-text">Select Issue Type</h3>
                                 <p className="text-xs text-gray-400 font-500 mt-1">For: <strong>{selectedProductName}</strong></p>
                             </div>
-                            <button onClick={() => setStep(2)} className="text-xs font-700 text-brand-green hover:underline">Change Product</button>
+                            <button onClick={() => setStep(purchaseType === 'online' ? 2 : 2.5)} className="text-xs font-700 text-brand-green hover:underline">Change Product</button>
                         </div>
                         <div className="p-6 space-y-3">
                             {CLAIM_TYPES.map(ct => (
@@ -293,8 +524,21 @@ const WarrantyClaimForm: React.FC = () => {
                             <div className="bg-brand-bg/50 rounded-xl p-4 border border-black/5">
                                 <div className="grid grid-cols-2 gap-4 text-xs">
                                     <div>
-                                        <span className="block font-700 text-gray-400 uppercase tracking-widest mb-1">Order</span>
-                                        <span className="font-800 text-brand-text">#{selectedOrderId.slice(0, 8)}</span>
+                                        <span className="block font-700 text-gray-400 uppercase tracking-widest mb-1">Purchase</span>
+                                        <span className="font-800 text-brand-text capitalize">{purchaseType}</span>
+                                    </div>
+                                    <div>
+                                        {purchaseType === 'online' ? (
+                                            <>
+                                                <span className="block font-700 text-gray-400 uppercase tracking-widest mb-1">Order</span>
+                                                <span className="font-800 text-brand-text">#{selectedOrderId.slice(0, 8)}</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span className="block font-700 text-gray-400 uppercase tracking-widest mb-1">Receipt</span>
+                                                <span className="font-800 text-brand-text">{receiptNumber}</span>
+                                            </>
+                                        )}
                                     </div>
                                     <div>
                                         <span className="block font-700 text-gray-400 uppercase tracking-widest mb-1">Product</span>
@@ -304,12 +548,9 @@ const WarrantyClaimForm: React.FC = () => {
                                         <span className="block font-700 text-gray-400 uppercase tracking-widest mb-1">Issue Type</span>
                                         <span className="font-800 text-brand-text">{CLAIM_TYPES.find(c => c.value === claimType)?.label}</span>
                                     </div>
-                                    <div>
-                                        <span className="block font-700 text-gray-400 uppercase tracking-widest mb-1">Priority</span>
-                                        <span className="font-800 text-yellow-600">Medium</span>
-                                    </div>
                                 </div>
                             </div>
+
 
                             <div>
                                 <label className="block text-xs font-800 text-gray-400 uppercase tracking-widest mb-2">

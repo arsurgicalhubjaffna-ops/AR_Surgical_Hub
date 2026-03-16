@@ -113,7 +113,11 @@ export interface WarrantyClaim {
     user_id: string;
     order_id: string;
     product_id: string;
+    purchase_type: 'online' | 'instore';
+    receipt_number?: string;
+    receipt_url?: string;
     claim_type: 'defective' | 'damaged' | 'malfunction' | 'missing_parts' | 'other';
+
     description: string;
     status: 'submitted' | 'under_review' | 'approved' | 'rejected' | 'resolved';
     priority: 'low' | 'medium' | 'high' | 'critical';
@@ -137,6 +141,7 @@ export interface WarrantyClaim {
         image_url: string;
     };
 }
+
 
 export interface Vacancy {
     id: string;

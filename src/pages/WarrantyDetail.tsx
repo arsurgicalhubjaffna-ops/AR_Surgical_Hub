@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, ShieldCheck, Clock, CheckCircle2, XCircle, Search, Package, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Clock, CheckCircle2, XCircle, Search, Package, AlertTriangle, Upload } from 'lucide-react';
 import insforge from '../lib/insforge';
 import { WarrantyClaim } from '../types';
 import ProductImage from '../components/ProductImage';
@@ -165,11 +165,21 @@ const WarrantyDetail: React.FC = () => {
                                 <div className="flex-1">
                                     <h4 className="font-800 text-brand-text mb-1">{claim.products?.name || 'Product'}</h4>
                                     <div className="flex items-center gap-3 text-sm text-secondary font-500">
-                                        <span>Order #{claim.order_id.slice(0, 8)}</span>
-                                        {claim.orders && (
+                                        {claim.purchase_type === 'online' ? (
                                             <>
+                                                <span>Order #{claim.order_id?.slice(0, 8)}</span>
+                                                {claim.orders && (
+                                                    <>
+                                                        <span className="w-1 h-1 rounded-full bg-black/10"></span>
+                                                        <span>{Number(claim.orders.total_amount).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
+                                                    </>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>In-Store Purchase</span>
                                                 <span className="w-1 h-1 rounded-full bg-black/10"></span>
-                                                <span>{Number(claim.orders.total_amount).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
+                                                <span>Receipt: {claim.receipt_number}</span>
                                             </>
                                         )}
                                     </div>
@@ -195,6 +205,19 @@ const WarrantyDetail: React.FC = () => {
                                         {claim.description || 'No description provided.'}
                                     </p>
                                 </div>
+                                {claim.purchase_type === 'instore' && claim.receipt_url && (
+                                    <div className="pt-2">
+                                        <span className="block text-[0.6rem] font-800 text-gray-400 uppercase tracking-widest mb-2">Proof of Purchase</span>
+                                        <a 
+                                            href={claim.receipt_url} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-black/5 hover:bg-brand-bg transition-colors text-xs font-700 text-brand-green"
+                                        >
+                                            <Upload size={14} /> View Receipt Image
+                                        </a>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

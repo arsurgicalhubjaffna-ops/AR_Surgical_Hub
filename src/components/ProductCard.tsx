@@ -59,7 +59,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 {/* Rating (decorative) */}
                 <div className="flex items-center gap-0.5">
                     {[1, 2, 3, 4, 5].map(i => (
-                        <span key={i} className={`text-[0.85rem] ${i <= 4 ? 'text-brand-blue' : 'text-brand-border'}`}>★</span>
+                        <span key={i} className={`pc-star text-[0.85rem] ${i <= 4 ? 'text-brand-blue' : 'text-brand-border'}`}>★</span>
                     ))}
                     <span className="text-[0.75rem] text-brand-text-muted ml-1.5">(24)</span>
                 </div>

@@ -3,7 +3,7 @@ import insforge from '../../lib/insforge';
 import { WarrantyClaim } from '../../types';
 import {
     ShieldCheck, ChevronDown, Search, AlertTriangle, CheckCircle2,
-    Clock, XCircle, Eye, X, MessageSquare, Filter
+    Clock, XCircle, Eye, X, MessageSquare, Filter, Store, ShoppingBag, Upload
 } from 'lucide-react';
 
 const STATUSES = ['submitted', 'under_review', 'approved', 'rejected', 'resolved'];
@@ -111,6 +111,7 @@ const AdminWarranty: React.FC = () => {
         const matchesSearch = !searchQuery ||
             c.users?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
             c.products?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            c.receipt_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
             c.id.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesStatus && matchesSearch;
     });
@@ -190,7 +191,8 @@ const AdminWarranty: React.FC = () => {
                                 <th className="px-6 py-4 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Claim ID</th>
                                 <th className="px-6 py-4 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Customer</th>
                                 <th className="px-6 py-4 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Product</th>
-                                <th className="px-6 py-4 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Type</th>
+                                <th className="px-6 py-4 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Method</th>
+                                <th className="px-6 py-4 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Reason</th>
                                 <th className="px-6 py-4 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Priority</th>
                                 <th className="px-6 py-4 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Status</th>
                                 <th className="px-6 py-4 text-[0.7rem] font-800 text-gray-400 uppercase tracking-widest">Date</th>
@@ -209,6 +211,16 @@ const AdminWarranty: React.FC = () => {
                                     </td>
                                     <td className="px-6 py-5">
                                         <span className="font-700 text-brand-text text-sm">{claim.products?.name || 'Unknown Product'}</span>
+                                    </td>
+                                    <td className="px-6 py-5">
+                                        <div className="flex items-center gap-2">
+                                            {claim.purchase_type === 'online' ? (
+                                                <ShoppingBag size={14} className="text-blue-500" />
+                                            ) : (
+                                                <Store size={14} className="text-orange-500" />
+                                            )}
+                                            <span className="text-xs font-700 text-brand-text capitalize">{claim.purchase_type}</span>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-5">
                                         <span className="text-xs font-700 text-brand-text">{getClaimTypeLabel(claim.claim_type)}</span>
@@ -280,12 +292,17 @@ const AdminWarranty: React.FC = () => {
                                     {selectedClaim.users?.phone && <p className="text-xs text-brand-green font-600 mt-1">{selectedClaim.users.phone}</p>}
                                 </div>
                                 <div className="bg-brand-bg/50 rounded-2xl p-5 border border-black/5">
-                                    <span className="block text-[0.6rem] font-800 text-gray-400 uppercase tracking-widest mb-2">Product</span>
+                                    <span className="block text-[0.6rem] font-800 text-gray-400 uppercase tracking-widest mb-2">Purchase Method</span>
                                     <div className="flex items-center gap-3">
-                                        {selectedClaim.products?.image_url && (
-                                            <img src={selectedClaim.products.image_url} alt="" className="w-12 h-12 rounded-xl object-cover border border-black/5" />
-                                        )}
-                                        <p className="font-800 text-brand-text text-sm">{selectedClaim.products?.name || 'Unknown Product'}</p>
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${selectedClaim.purchase_type === 'online' ? 'bg-blue-500/10 text-blue-500' : 'bg-orange-500/10 text-orange-500'}`}>
+                                            {selectedClaim.purchase_type === 'online' ? <ShoppingBag size={20} /> : <Store size={20} />}
+                                        </div>
+                                        <div>
+                                            <p className="font-800 text-brand-text text-sm capitalize">{selectedClaim.purchase_type} Purchase</p>
+                                            {selectedClaim.purchase_type === 'instore' && (
+                                                <p className="text-xs text-gray-400 font-600">Receipt: {selectedClaim.receipt_number}</p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -315,6 +332,30 @@ const AdminWarranty: React.FC = () => {
                                     <p className="text-sm font-500 text-brand-text leading-relaxed bg-white rounded-xl p-4 border border-black/5">
                                         {selectedClaim.description || 'No description provided.'}
                                     </p>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="bg-brand-bg/50 rounded-2xl p-5 border border-black/5">
+                                        <span className="block text-[0.6rem] font-800 text-gray-400 uppercase tracking-widest mb-2">Product Information</span>
+                                        <div className="flex items-center gap-3">
+                                            {selectedClaim.products?.image_url && (
+                                                <img src={selectedClaim.products.image_url} alt="" className="w-12 h-12 rounded-xl object-cover border border-black/5" />
+                                            )}
+                                            <p className="font-800 text-brand-text text-sm">{selectedClaim.products?.name || 'Unknown Product'}</p>
+                                        </div>
+                                    </div>
+                                    {selectedClaim.purchase_type === 'instore' && selectedClaim.receipt_url && (
+                                        <div className="bg-brand-bg/50 rounded-2xl p-5 border border-black/5 flex flex-col justify-center">
+                                            <span className="block text-[0.6rem] font-800 text-gray-400 uppercase tracking-widest mb-2">Proof of Purchase</span>
+                                            <a 
+                                                href={selectedClaim.receipt_url} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 text-xs font-700 text-brand-green hover:underline"
+                                            >
+                                                <Upload size={14} /> View Receipt Image
+                                            </a>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

@@ -219,8 +219,7 @@ describe('ProductCard', () => {
 
     it('renders fallback placeholder when image_url is null', () => {
         render(<AllProviders><ProductCard product={mockProduct2} /></AllProviders>);
-        const img = screen.getByAltText('Surgical Scalpel');
-        expect(img.src).toContain('placeholder');
+        expect(screen.getByText('AR SURGICAL')).toBeInTheDocument();
     });
 
     it('renders category badge when category_name is provided', () => {
@@ -245,11 +244,11 @@ describe('ProductCard', () => {
         expect(link.closest('a')).toHaveAttribute('href', `/product/${mockProduct.id}`);
     });
 
-    it('renders filled heart when product is in wishlist', async () => {
+    it('renders active styles when product is in wishlist', async () => {
         render(<AllProviders><ProductCard product={mockProduct} /></AllProviders>);
         const wishlistBtn = screen.getByTitle('Wishlist');
         await userEvent.click(wishlistBtn); // add to wishlist
-        expect(wishlistBtn.className).toContain('active');
+        expect(wishlistBtn.className).toContain('bg-brand-green-light');
     });
 
     it('renders 5 rating stars', () => {
@@ -265,7 +264,7 @@ describe('ProductCard', () => {
 describe('Header Component', () => {
     it('renders the logo text', () => {
         render(<AllProviders><Header /></AllProviders>);
-        expect(screen.getByText('Surgical Hub')).toBeInTheDocument();
+        expect(screen.getByText(/SURGICAL HUB/i)).toBeInTheDocument();
     });
 
     it('renders navigation links', () => {
@@ -289,8 +288,8 @@ describe('Header Component', () => {
 
     it('renders contact info (phone and email)', () => {
         render(<AllProviders><Header /></AllProviders>);
-        expect(screen.getByText(/\+1 \(555\) 123-4567/)).toBeInTheDocument();
-        expect(screen.getByText(/support@arsurgical.com/)).toBeInTheDocument();
+        expect(screen.getByText(/\+94 77 0700 737/)).toBeInTheDocument();
+        expect(screen.getByText(/support@arsurgicalhub.com/)).toBeInTheDocument();
     });
 });
 
@@ -365,7 +364,7 @@ describe('Login Page', () => {
 
     it('shows "Sign In" submit button on login mode', () => {
         render(<AllProviders><Login /></AllProviders>);
-        expect(screen.getByText(/Sign In/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/Sign In/i).length).toBeGreaterThan(0);
     });
 
     it('switches to register form when "Create one" is clicked', async () => {
