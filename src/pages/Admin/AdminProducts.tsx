@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import insforge from '../../lib/insforge';
-import { Plus, Pencil, Trash2, X, Image as ImageIcon, Search, Filter } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Image as ImageIcon, Search, Filter, Upload, Loader2 } from 'lucide-react';
 import { Product, Category, Subcategory } from '../../types';
 import ProductImage from '../../components/ProductImage';
 
@@ -15,6 +15,7 @@ const AdminProducts: React.FC = () => {
     const [form, setForm] = useState(emptyForm);
     const [editId, setEditId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [uploading, setUploading] = useState(false);
 
     const load = async () => {
         try {
@@ -53,6 +54,29 @@ const AdminProducts: React.FC = () => {
         });
         setEditId(p.id);
         setModal(true);
+    };
+    
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        try {
+            const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+            const { data, error } = await insforge.storage
+                .from('product_images')
+                .upload(`products/${fileName}`, file);
+
+            if (error) throw error;
+            if (data?.url) {
+                setForm(prev => ({ ...prev, image_url: data.url }));
+            }
+        } catch (err) {
+            console.error('Upload Error:', err);
+            alert('Failed to upload image. Please try again.');
+        } finally {
+            setUploading(false);
+        }
     };
 
     const save = async () => {
@@ -284,22 +308,50 @@ const AdminProducts: React.FC = () => {
                                 </select>
                             </div>
                             <div className="sm:col-span-2">
-                                <label className="block text-xs font-800 text-brand-text-muted uppercase tracking-widest mb-2">Media Asset URL</label>
-                                <div className="flex gap-4 items-center">
-                                    <input
-                                        type="text"
-                                        className="flex-1 bg-brand-bg border border-brand-border rounded-xl px-4 py-3 outline-none focus:border-brand-green font-500 text-[0.85rem] text-brand-text-muted"
-                                        placeholder="https://assets.arsurgical.com/..."
-                                        value={form.image_url}
-                                        onChange={e => setForm({ ...form, image_url: e.target.value })}
-                                    />
-                                    <div className="w-12 h-12 rounded-xl bg-brand-bg flex items-center justify-center border border-black/5 shrink-0 overflow-hidden">
+                                <label className="block text-xs font-800 text-brand-text-muted uppercase tracking-widest mb-2">Media Asset</label>
+                                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                                    <div className="w-24 h-24 rounded-2xl bg-brand-bg flex items-center justify-center border border-black/5 shrink-0 overflow-hidden shadow-inner">
                                         <ProductImage
                                             src={form.image_url}
                                             alt={form.name || "Preview"}
                                             className="w-full h-full object-cover"
-                                            placeholderClassName="text-lg"
+                                            placeholderClassName="text-2xl"
                                         />
+                                    </div>
+                                    <div className="flex-1 w-full space-y-3">
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="file"
+                                                id="product-image-upload"
+                                                className="hidden"
+                                                accept="image/*"
+                                                onChange={handleImageUpload}
+                                                disabled={uploading}
+                                            />
+                                            <label
+                                                htmlFor="product-image-upload"
+                                                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-brand-border hover:border-brand-green hover:bg-brand-green/5 transition-all cursor-pointer group ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            >
+                                                {uploading ? (
+                                                    <Loader2 size={18} className="animate-spin text-brand-green" />
+                                                ) : (
+                                                    <Upload size={18} className="text-brand-text-muted group-hover:text-brand-green" />
+                                                )}
+                                                <span className="text-sm font-700 text-brand-text-muted group-hover:text-brand-green">
+                                                    {uploading ? 'Processing Architecture...' : 'Upload Asset Image'}
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <div className="relative">
+                                            <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-text-muted/50" size={16} />
+                                            <input
+                                                type="text"
+                                                className="w-full bg-brand-bg border border-brand-border rounded-xl pl-10 pr-4 py-2.5 outline-none focus:border-brand-green font-500 text-[0.75rem] text-brand-text-muted"
+                                                placeholder="Or paste external URL (e.g. Unsplash)"
+                                                value={form.image_url}
+                                                onChange={e => setForm({ ...form, image_url: e.target.value })}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
