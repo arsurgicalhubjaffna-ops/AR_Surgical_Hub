@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import insforge from '../../lib/insforge';
-import { Plus, Pencil, Trash2, X, Image as ImageIcon, Search, CheckCircle2, Globe, FileText, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Image as ImageIcon, Search, CheckCircle2, Globe, FileText, ToggleLeft, ToggleRight, Upload, RefreshCw, User } from 'lucide-react';
+import toast from 'react-hot-toast';
 import ProductImage from '../../components/ProductImage';
 import { Blog } from '../../types';
 
@@ -21,6 +22,7 @@ const AdminBlogs: React.FC = () => {
     const [form, setForm] = useState(emptyForm);
     const [editId, setEditId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [uploading, setUploading] = useState<string | null>(null);
 
     const load = async () => {
         try {
@@ -32,6 +34,7 @@ const AdminBlogs: React.FC = () => {
             setBlogs(data || []);
         } catch (err) {
             console.error('Blog Load Error:', err);
+            toast.error('Failed to sync blogs');
         } finally {
             setLoading(false);
         }
@@ -54,6 +57,27 @@ const AdminBlogs: React.FC = () => {
         setModal(true);
     };
 
+    const handleImageUpload = async (field: 'featured_image' | 'author_image', e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(field);
+        try {
+            const { data, error } = await insforge.storage
+                .from('blog_assets')
+                .upload(`${Date.now()}_${file.name}`, file);
+
+            if (error || !data) throw error || new Error('Upload failed');
+            setForm(prev => ({ ...prev, [field]: data.url }));
+            toast.success('Image uploaded successfully');
+        } catch (err) {
+            console.error('Upload Error:', err);
+            toast.error('Failed to upload image');
+        } finally {
+            setUploading(null);
+        }
+    };
+
     const save = async () => {
         try {
             const payload = {
@@ -73,16 +97,18 @@ const AdminBlogs: React.FC = () => {
                     .update(payload)
                     .eq('id', editId);
                 if (error) throw error;
+                toast.success('Blog post updated');
             } else {
                 const { error } = await insforge.database
                     .from('blogs')
                     .insert([payload]);
                 if (error) throw error;
+                toast.success('New blog post created');
             }
             setModal(false);
             load();
         } catch (err) {
-            alert('Failed to save blog');
+            toast.error('Failed to save blog');
         }
     };
 
@@ -91,9 +117,10 @@ const AdminBlogs: React.FC = () => {
         try {
             const { error } = await insforge.database.from('blogs').delete().eq('id', id);
             if (error) throw error;
+            toast.success('Blog post deleted');
             load();
         } catch (err) {
-            alert('Failed to delete blog');
+            toast.error('Failed to delete blog');
         }
     };
 
@@ -104,10 +131,10 @@ const AdminBlogs: React.FC = () => {
                 .update({ is_published: !b.is_published, updated_at: new Date().toISOString() })
                 .eq('id', b.id);
             if (error) throw error;
+            toast.success(b.is_published ? 'Post set as draft' : 'Post published');
             load();
         } catch (e) {
-            console.error(e);
-            alert('Failed to toggle publish status');
+            toast.error('Failed to update status');
         }
     };
 
@@ -303,7 +330,7 @@ const AdminBlogs: React.FC = () => {
                                 />
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-6">
                                     <div>
                                         <label className="block text-xs font-800 text-gray-400 uppercase tracking-widest mb-2">Author Name <span className="text-brand-red">*</span></label>
@@ -317,37 +344,69 @@ const AdminBlogs: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-800 text-gray-400 uppercase tracking-widest mb-2">Author Image URL</label>
+                                        <label className="block text-xs font-800 text-gray-400 uppercase tracking-widest mb-2">Author Avatar</label>
                                         <div className="flex gap-4 items-center">
-                                            <input
-                                                type="text"
-                                                className="flex-1 bg-brand-bg border border-black/5 rounded-xl px-4 py-3 outline-none focus:border-brand-green font-500 text-[0.85rem] text-secondary"
-                                                placeholder="https://..."
-                                                value={form.author_image}
-                                                onChange={e => setForm({ ...form, author_image: e.target.value })}
-                                            />
+                                            <label className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-700 text-sm cursor-pointer transition-all ${uploading === 'author_image' ? 'bg-gray-100 text-gray-400' : 'bg-white border border-black/10 text-brand-text hover:bg-brand-bg shadow-sm'}`}>
+                                                {uploading === 'author_image' ? (
+                                                    <RefreshCw size={16} className="animate-spin" />
+                                                ) : (
+                                                    <Upload size={16} />
+                                                )}
+                                                {uploading === 'author_image' ? 'Uploading...' : 'Upload Avatar'}
+                                                <input 
+                                                    type="file" 
+                                                    className="hidden" 
+                                                    accept="image/*"
+                                                    onChange={(e) => handleImageUpload('author_image', e)}
+                                                    disabled={uploading !== null}
+                                                />
+                                            </label>
                                             <div className="w-12 h-12 rounded-full bg-brand-bg flex items-center justify-center border border-black/5 shrink-0 overflow-hidden">
-                                                {form.author_image ? <img src={form.author_image} className="w-full h-full object-cover" /> : <ImageIcon size={20} className="text-gray-300" />}
+                                                {form.author_image ? <img src={form.author_image} className="w-full h-full object-cover" /> : <User size={20} className="text-gray-300" />}
                                             </div>
                                         </div>
+                                        <input
+                                            type="text"
+                                            className="w-full mt-3 bg-brand-bg border border-black/5 rounded-xl px-4 py-2 outline-none focus:border-brand-green font-500 text-[0.75rem] text-secondary"
+                                            placeholder="Or paste avatar URL..."
+                                            value={form.author_image}
+                                            onChange={e => setForm({ ...form, author_image: e.target.value })}
+                                        />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-800 text-gray-400 uppercase tracking-widest mb-2">Featured Image URL</label>
-                                    <input
-                                        type="text"
-                                        className="w-full bg-brand-bg border border-black/5 rounded-xl px-4 py-3 mb-4 outline-none focus:border-brand-green font-500 text-[0.85rem] text-secondary"
-                                        placeholder="https://..."
-                                        value={form.featured_image}
-                                        onChange={e => setForm({ ...form, featured_image: e.target.value })}
-                                    />
-                                    <div className="w-full h-32 rounded-xl bg-brand-bg border border-black/5 flex items-center justify-center overflow-hidden">
-                                        <ProductImage
-                                            src={form.featured_image}
-                                            alt={form.title}
-                                            className="w-full h-full object-cover"
+                                    <label className="block text-xs font-800 text-gray-400 uppercase tracking-widest mb-2">Featured Image</label>
+                                    <div className="space-y-3">
+                                        <label className={`flex items-center justify-center gap-2 w-full py-4 rounded-xl font-700 text-sm cursor-pointer transition-all border-2 border-dashed ${uploading === 'featured_image' ? 'bg-gray-50 border-gray-200 text-gray-400' : 'bg-white border-black/5 text-gray-500 hover:border-brand-green hover:bg-brand-green/5 hover:text-brand-green'}`}>
+                                            {uploading === 'featured_image' ? (
+                                                <RefreshCw size={20} className="animate-spin text-brand-green" />
+                                            ) : (
+                                                <ImageIcon size={20} />
+                                            )}
+                                            {uploading === 'featured_image' ? 'Uploading content...' : 'Click to upload featured image'}
+                                            <input 
+                                                type="file" 
+                                                className="hidden" 
+                                                accept="image/*"
+                                                onChange={(e) => handleImageUpload('featured_image', e)}
+                                                disabled={uploading !== null}
+                                            />
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="w-full bg-brand-bg border border-black/5 rounded-xl px-4 py-2 outline-none focus:border-brand-green font-500 text-[0.75rem] text-secondary"
+                                            placeholder="Or paste image URL..."
+                                            value={form.featured_image}
+                                            onChange={e => setForm({ ...form, featured_image: e.target.value })}
                                         />
+                                        <div className="w-full h-32 rounded-xl bg-brand-bg border border-black/5 flex items-center justify-center overflow-hidden">
+                                            <ProductImage
+                                                src={form.featured_image}
+                                                alt={form.title}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>

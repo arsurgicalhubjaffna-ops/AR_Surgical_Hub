@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, User, Tag, Calendar, Share2, Facebook, Twitter, Linkedin, Copy } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import toast from 'react-hot-toast';
 import insforge from '../lib/insforge';
 import ProductImage from '../components/ProductImage';
 import { Blog } from '../types';
@@ -90,16 +91,21 @@ const BlogDetail: React.FC = () => {
 
     const copyLink = () => {
         navigator.clipboard.writeText(window.location.href);
-        alert('Link copied to clipboard!');
+        toast.success('Link copied to clipboard!');
     };
+
+    const shareUrl = encodeURIComponent(window.location.href);
+    const shareTitle = encodeURIComponent(blog.title);
 
     return (
         <div className="bg-white min-h-screen">
             <article className="max-w-[1000px] mx-auto px-5 md:px-10 py-12 md:py-20">
                 {/* Back Link */}
                 <Link to="/blogs" className="inline-flex items-center gap-2 text-sm font-700 text-gray-500 hover:text-brand-green transition-colors mb-8 md:mb-12">
-                    <ArrowLeft size={16} /> Back to Hub
+                    <ArrowLeft size={16} className="text-brand-green" /> Back to Hub
                 </Link>
+
+                {/* Header ... (rest of the file) */}
 
                 {/* Header */}
                 <header className="mb-10 md:mb-14 text-center md:text-left">
@@ -165,15 +171,30 @@ const BlogDetail: React.FC = () => {
                         <div className="text-center lg:text-left">
                             <h3 className="font-800 tracking-tight text-brand-text mb-4 text-sm uppercase">Share this article</h3>
                             <div className="flex justify-center lg:justify-start gap-3">
-                                <button className="w-10 h-10 rounded-full bg-brand-bg border border-black/5 flex items-center justify-center text-blue-600 hover:bg-blue-50 transition-colors">
+                                <a 
+                                    href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 rounded-full bg-brand-bg border border-black/5 flex items-center justify-center text-blue-600 hover:bg-blue-50 transition-colors"
+                                >
                                     <Facebook size={18} />
-                                </button>
-                                <button className="w-10 h-10 rounded-full bg-brand-bg border border-black/5 flex items-center justify-center text-sky-500 hover:bg-sky-50 transition-colors">
+                                </a>
+                                <a 
+                                    href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 rounded-full bg-brand-bg border border-black/5 flex items-center justify-center text-sky-500 hover:bg-sky-50 transition-colors"
+                                >
                                     <Twitter size={18} />
-                                </button>
-                                <button className="w-10 h-10 rounded-full bg-brand-bg border border-black/5 flex items-center justify-center text-blue-800 hover:bg-blue-50 transition-colors">
+                                </a>
+                                <a 
+                                    href={`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 rounded-full bg-brand-bg border border-black/5 flex items-center justify-center text-blue-800 hover:bg-blue-50 transition-colors"
+                                >
                                     <Linkedin size={18} />
-                                </button>
+                                </a>
                                 <button onClick={copyLink} className="w-10 h-10 rounded-full bg-brand-bg border border-black/5 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors hover:text-brand-text" title="Copy Link">
                                     <Copy size={18} />
                                 </button>
