@@ -108,12 +108,16 @@ const Home: React.FC = () => {
                         <div className="relative justify-self-center lg:justify-self-auto">
                             <div className="relative w-full max-w-[340px]">
                                 <img
-                                    src="https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=480&auto=format&fit=crop"
+                                    src={getSetting('home_hero_image', 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=480&auto=format&fit=crop')}
                                     alt="Surgical Instruments"
                                     className="w-full rounded-[20px] object-cover aspect-[3/4] shadow-2xl"
                                 />
                                 <div className="absolute bottom-6 left-[-15px] sm:left-[-30px] flex items-center gap-2.5 bg-white border border-black/8 rounded-xl p-2.5 px-4 shadow-xl z-10 animate-in fade-in slide-in-from-left-4 duration-700">
-                                    <ShieldCheck size={22} className="text-brand-green" />
+                                    {getSetting('iso_badge_image') ? (
+                                        <img src={getSetting('iso_badge_image')} alt="ISO" className="w-8 h-8 object-contain" />
+                                    ) : (
+                                        <ShieldCheck size={22} className="text-brand-green" />
+                                    )}
                                     <div>
                                         <strong className="block text-[0.88rem] font-700 text-brand-text leading-tight">ISO Certified</strong>
                                         <span className="text-[0.72rem] text-gray-400">Medical Grade</span>
@@ -231,7 +235,7 @@ const Home: React.FC = () => {
                         </div>
                         <div className="shrink-0 w-full max-w-[280px]">
                             <img
-                                src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=480&auto=format&fit=crop"
+                                src={getSetting('promo_strip_image', 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=480&auto=format&fit=crop')}
                                 alt="Medical Promotion"
                                 className="w-full rounded-2xl object-cover aspect-[4/3] shadow-3xl"
                             />
@@ -274,7 +278,7 @@ const Home: React.FC = () => {
                         </div>
                         <div className="w-full max-w-[340px] shrink-0 rounded-2xl overflow-hidden aspect-[4/3] shadow-lg">
                             <ProductImage
-                                src="https://images.unsplash.com/photo-1584889341755-bab37c0c2d44?w=500&auto=format&fit=crop"
+                                src={getSetting('promo_wide_image', 'https://images.unsplash.com/photo-1584889341755-bab37c0c2d44?w=500&auto=format&fit=crop')}
                                 alt="Safety Masks"
                                 className="w-full h-full object-cover"
                             />

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Save, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Save, RefreshCw, AlertCircle, CheckCircle2, Image as ImageIcon, Upload, X } from 'lucide-react';
 import { useSettings } from '../../hooks/useSettings';
+import insforge from '../../lib/insforge';
 
 const AdminSettings: React.FC = () => {
     const { rawSettings, loading, error, updateSetting, refreshSettings } = useSettings();
     const [saving, setSaving] = useState<string | null>(null);
+    const [uploading, setUploading] = useState<string | null>(null);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [editValues, setEditValues] = useState<Record<string, string>>({});
 
@@ -34,6 +36,41 @@ const AdminSettings: React.FC = () => {
 
     const handleChange = (id: string, value: string) => {
         setEditValues(prev => ({ ...prev, [id]: value }));
+    };
+
+    const handleImageUpload = async (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(id);
+        setMessage(null);
+
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${id}-${Date.now()}.${fileExt}`;
+            const filePath = `settings/${fileName}`;
+
+            const { error: uploadError } = await insforge.storage
+                .from('site_assets')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const response = insforge.storage
+                .from('site_assets')
+                .getPublicUrl(filePath);
+
+            const publicUrl = typeof response === 'string' ? response : (response as any).data.publicUrl;
+            
+            setEditValues(prev => ({ ...prev, [id]: publicUrl }));
+            setMessage({ type: 'success', text: 'Image uploaded successfully! Click Save to apply changes.' });
+        } catch (err: any) {
+            console.error('Upload error:', err);
+            setMessage({ type: 'error', text: `Failed to upload image: ${err.message || 'Unknown error'}` });
+        } finally {
+            setUploading(null);
+            setTimeout(() => setMessage(null), 3000);
+        }
     };
 
     if (loading && rawSettings.length === 0) {
@@ -118,6 +155,60 @@ const AdminSettings: React.FC = () => {
                                                     value={editValues[setting.id] ?? setting.value}
                                                     onChange={(e) => handleChange(setting.id, e.target.value)}
                                                 />
+                                            ) : setting.field_type === 'image' ? (
+                                                <div className="space-y-4">
+                                                    {(editValues[setting.id] || setting.value) && (
+                                                        <div className="relative group w-full max-w-[200px] aspect-video rounded-xl overflow-hidden border border-black/5 bg-brand-bg">
+                                                            <img 
+                                                                src={editValues[setting.id] ?? setting.value} 
+                                                                alt={setting.key}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=Invalid+Image+URL';
+                                                                }}
+                                                            />
+                                                            {editValues[setting.id] && editValues[setting.id] !== setting.value && (
+                                                                <button 
+                                                                    onClick={() => {
+                                                                        setEditValues(prev => {
+                                                                            const next = { ...prev };
+                                                                            delete next[setting.id];
+                                                                            return next;
+                                                                        });
+                                                                    }}
+                                                                    className="absolute top-2 right-2 bg-black/50 text-white p-1.5 rounded-full hover:bg-black/70 transition-all"
+                                                                    title="Revert change"
+                                                                >
+                                                                    <X size={14} />
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    <div className="flex items-center gap-3">
+                                                        <label className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-700 text-sm cursor-pointer transition-all ${uploading === setting.id ? 'bg-gray-100 text-gray-400' : 'bg-white border border-black/10 text-brand-text hover:bg-brand-bg shadow-sm'}`}>
+                                                            {uploading === setting.id ? (
+                                                                <RefreshCw size={16} className="animate-spin" />
+                                                            ) : (
+                                                                <Upload size={16} />
+                                                            )}
+                                                            {uploading === setting.id ? 'Uploading...' : 'Upload Image'}
+                                                            <input 
+                                                                type="file" 
+                                                                className="hidden" 
+                                                                accept="image/*"
+                                                                onChange={(e) => handleImageUpload(setting.id, e)}
+                                                                disabled={uploading === setting.id}
+                                                            />
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Or enter URL manually..."
+                                                            className="flex-1 bg-brand-bg border-none rounded-xl px-4 py-2.5 text-brand-text font-500 text-sm focus:ring-2 focus:ring-brand-green/20 transition-all"
+                                                            value={editValues[setting.id] ?? setting.value}
+                                                            onChange={(e) => handleChange(setting.id, e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
                                             ) : (
                                                 <input
                                                     type="text"
